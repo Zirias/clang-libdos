@@ -5,11 +5,18 @@ int main();
 static char *progname(void);
 void _getcinfo(void);
 
+#ifndef NOARGV
 static int argc = 0;
 static char *argv[32];
+#endif
 
 static void __attribute__((__noreturn__, __used__)) start(void)
 {
+    _getcinfo();
+
+#ifdef NOARGV
+    exit(main());
+#else
     char *cmdline = (char *)0x81;
     argc = 1;
     argv[0] = progname();
@@ -24,8 +31,9 @@ static void __attribute__((__noreturn__, __used__)) start(void)
 	}
     }
 
-    _getcinfo();
     exit(main(argc, argv));
+#endif
+
 }
 
 void __attribute__((__noreturn__)) exit(int status)
@@ -55,6 +63,7 @@ unsigned short dosversion(void)
     return v1;
 }
 
+#ifndef NOARGV
 static char *progname(void)
 {
     if (dosversion() < 0x0300) return "";
@@ -65,4 +74,5 @@ static char *progname(void)
     while (*envptr) envptr += strlen(envptr) + 1;
     return envptr + 3;
 }
+#endif
 
