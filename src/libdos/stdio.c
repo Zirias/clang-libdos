@@ -6,6 +6,16 @@
 
 static char fpbuf[32];
 
+int errno = 0;
+
+static const int stdinfd = 0;
+static const int stdoutfd = 1;
+static const int stderrfd = 2;
+
+const FILE *stdin = &stdinfd;
+const FILE *stdout = &stdoutfd;
+const FILE *stderr = &stderrfd;
+
 typedef enum farglen
 {
     FAL_HH,
@@ -205,6 +215,16 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
     return n;
 }
 
+int vfprintf(FILE *stream, const char *format, va_list ap)
+{
+    if (stream != stdout && stream != stderr)
+    {
+	errno = ENOSYS;
+	return -1;
+    }
+    return vprintf(format, ap);
+}
+
 int vsprintf(char *str, const char *format, va_list ap)
 {
     return vsnprintf(str, 0, format, ap);
@@ -250,6 +270,17 @@ int sprintf(char *str, const char *format, ...)
     return ret;
 }
 
+int fprintf(FILE *stream, const char *format, ...)
+{
+    va_list ap;
+
+    va_start(ap, format);
+    int ret = vfprintf(stream, format, ap);
+    va_end(ap);
+
+    return ret;
+}
+
 int printf(const char *format, ...)
 {
     va_list ap;
@@ -261,3 +292,25 @@ int printf(const char *format, ...)
     return ret;
 }
 
+int puts(const char *s)
+{
+    putstr(s);
+    putstr("\n");
+    return 1;
+}
+
+int fputs(const char *s, FILE *stream)
+{
+    if (stream != stdout && stream != stderr)
+    {
+	errno = ENOSYS;
+	return EOF;
+    }
+    return putstr(s);
+}
+
+void perror(const char *s)
+{
+    if (s && *s) printf("%s: %s\n", s, strerror(errno));
+    else puts(strerror(errno));
+}

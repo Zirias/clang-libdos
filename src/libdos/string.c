@@ -1,6 +1,9 @@
 #include "string.h"
+#include "errno.h"
+#include "stdio.h"
 
 static char *strtokptr = 0;
+static char strerrunkn[18];
 
 size_t strlen(const char *s)
 {
@@ -62,4 +65,16 @@ void *memcpy(void *dest, const void *src, size_t n)
 	((char *)dest)[i] = ((const char *)src)[i];
     }
     return dest;
+}
+
+char *strerror(int errnum)
+{
+    switch (errnum)
+    {
+	case EINVAL: return "Invalid argument";
+	case ENOSYS: return "Function not implemented";
+    }
+    errno = EINVAL;
+    snprintf(strerrunkn, 18, "Unknown error %03d", errnum);
+    return strerrunkn;
 }

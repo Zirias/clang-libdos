@@ -3,6 +3,7 @@
 #include "libdos/stdlib.h"
 #include "libdos/string.h"
 #include "libdos/dos.h"
+#include "libdos/errno.h"
 
 int main(int argc, char **argv)
 {
@@ -27,14 +28,21 @@ int main(int argc, char **argv)
     free(test1);
     free(test2);
     unsigned short ver = dosversion();
-    printf("%s: DOS version: %hhu.%02hhu\n", argv[0],
+    fprintf(stderr, "%s: DOS version: %hhu.%02hhu\n", argv[0],
 	    (unsigned char)(ver >> 8), (unsigned char)(ver));
-    putstr("Press ESC to quit.\n");
-    int ch;
-    while ((ch = getch()) != KEY_ESC)
+    int i = 5;
+    FILE *foo = &i;
+    if (fputs("test", foo) < 0)
     {
-	printf("Got char: 0x%04x\n", ch);
+	perror("fputs");
     }
+    errno = 0;
+    puts(strerror(42));
+    if (errno)
+    {
+	perror("strerror");
+    }
+    getch();
     setcursor(1);
     setblink(1);
     setpage(0);
