@@ -13,7 +13,7 @@ void _getcinfo(void)
 	    "mov    $0x0300, %%ax   \n\t"
 	    "int    $0x10	    \n\t"
 	    : "=d" (pos)
-	    :
+	    : "b" (cpage)
 	    : "ax", "cx"
 	    );
     ccol = pos & 0xff;
