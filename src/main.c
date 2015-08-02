@@ -12,9 +12,10 @@ int main(int argc, char **argv)
     clrscr();
     setcursor(0);
     char *test1 = malloc(7);
-    strcpy(test1, "test\n");
+    sprintf(test1, "test%d\n", 1);
     char *test2 = malloc(7);
-    strcpy(test2, "foot\n");
+    int num = snprintf(test2, 7, "t: %d testing\n", 42);
+    printf("snprintf() needed %d bytes for 't: %d testing\\n'\n", num, 42);
     putstr("Hello world!\n\n$Bla$.\n");
     putstr(test1);
     putstr(test2);
