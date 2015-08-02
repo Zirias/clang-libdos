@@ -69,6 +69,11 @@ int getpage(void)
     return cpage;
 }
 
+void setattr(int attr)
+{
+    cattr = attr;
+}
+
 void setscroll(int scroll)
 {
     cscroll = scroll;
@@ -83,6 +88,16 @@ void setcursor(int show)
 	    "int    $0x10	    \n\t"
 	    :
 	    : "c" (ccsh)
+	    );
+}
+
+void setblink(int blink)
+{
+    __asm__ volatile (
+	    "mov    $0x1003, %%ax   \n\t"
+	    "int    $0x10	    \n\t"
+	    :
+	    : "b" (!!blink)
 	    );
 }
 
@@ -111,16 +126,20 @@ int getch(void)
     return ch;
 }
 
-void putch(char c)
+void putchrp(char c, int repeat)
 {
     __asm__ volatile (
 	    "mov    $0x09, %%ah	    \n\t"
-	    "mov    $1, %%cx	    \n\t"
 	    "int    $0x10	    \n\t"
 	    :
-	    : "a" (c), "b" ((cpage << 8) | cattr)
+	    : "a" (c), "b" ((cpage << 8) | cattr), "c" (repeat)
 	    : "cx"
 	    );
+}
+
+void putch(char c)
+{
+    putchrp(c, 1);
 }
 
 int putstr(const char *s)
