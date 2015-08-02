@@ -1,8 +1,15 @@
 #ifndef LIBDOS_STDARG_H
 #define LIBDOS_STDARG_H
 
-typedef unsigned char *va_list;
-#define va_start(list, param) (list = (((va_list)&param) + sizeof(param)))
-#define va_arg(list, mode) ((mode *)(list = (char *)list + sizeof(mode)))[-1]
+#ifndef _VA_LIST
+typedef __builtin_va_list va_list;
+#define _VA_LIST
+#endif
+#define va_start(ap, param) __builtin_va_start(ap, param)
+#define va_end(ap)          __builtin_va_end(ap)
+#define va_arg(ap, type)    __builtin_va_arg(ap, type)
+#define va_copy(dest, src)  __builtin_va_copy(dest, src)
+
+int vprintf(const char *format, va_list ap);
 
 #endif

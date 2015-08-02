@@ -39,9 +39,9 @@ void __attribute__((__noreturn__)) exit(int status)
     __builtin_unreachable();
 }
 
-short dosversion(void)
+unsigned short dosversion(void)
 {
-    short v1, v2;
+    unsigned short v1, v2;
     __asm__ (
 	    "mov    $0x30, %%ah	    \n\t"
 	    "int    $0x21	    \n\t"
