@@ -4,6 +4,7 @@
 int setpage(int page);
 int getpage(void);
 void setscroll(int scroll);
+void setcursor(int show);
 void clrscr(void);
 void gotoxy(int x, int y);
 int getch(void);

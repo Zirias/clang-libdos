@@ -10,6 +10,7 @@ int main(int argc, char **argv)
     gotoxy(0,0);
     setscroll(0);
     clrscr();
+    setcursor(0);
     char *test1 = malloc(7);
     strcpy(test1, "test\n");
     char *test2 = malloc(7);
@@ -23,6 +24,7 @@ int main(int argc, char **argv)
     printf("%s: DOS version: %hhu.%02hhu\n", argv[0],
 	    (unsigned char)(ver >> 8), (unsigned char)(ver));
     getch();
+    setcursor(1);
     setpage(0);
     return 0;
 }

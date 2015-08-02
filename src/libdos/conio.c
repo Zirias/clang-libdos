@@ -3,6 +3,7 @@
 static int cpage = 0;
 static int crow;
 static int ccol;
+static unsigned short ccsh;
 static int cattr = 0x07;
 static int cscroll = 1;
 
@@ -12,12 +13,13 @@ void _getcinfo(void)
     __asm__ (
 	    "mov    $0x0300, %%ax   \n\t"
 	    "int    $0x10	    \n\t"
-	    : "=d" (pos)
+	    : "=c" (ccsh), "=d" (pos)
 	    : "b" (cpage)
-	    : "ax", "cx"
+	    : "ax"
 	    );
     ccol = pos & 0xff;
     crow = (pos >> 8) & 0xff;
+
 }
 
 static void _gotoxy(void)
@@ -70,6 +72,18 @@ int getpage(void)
 void setscroll(int scroll)
 {
     cscroll = scroll;
+}
+
+void setcursor(int show)
+{
+    if (show) ccsh &= 0x1fff;
+    else ccsh |= 0x2000;
+    __asm__ volatile (
+	    "mov    $0x01, %%ah	    \n\t"
+	    "int    $0x10	    \n\t"
+	    :
+	    : "c" (ccsh)
+	    );
 }
 
 void clrscr(void)
