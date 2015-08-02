@@ -8,7 +8,6 @@ int main(int argc, char **argv)
 {
     setpage(1);
     gotoxy(0,0);
-    setscroll(0);
     clrscr();
     setcursor(0);
     setblink(0);
@@ -30,7 +29,12 @@ int main(int argc, char **argv)
     unsigned short ver = dosversion();
     printf("%s: DOS version: %hhu.%02hhu\n", argv[0],
 	    (unsigned char)(ver >> 8), (unsigned char)(ver));
-    getch();
+    putstr("Press ESC to quit.\n");
+    int ch;
+    while ((ch = getch()) != KEY_ESC)
+    {
+	printf("Got char: 0x%04x\n", ch);
+    }
     setcursor(1);
     setblink(1);
     setpage(0);
