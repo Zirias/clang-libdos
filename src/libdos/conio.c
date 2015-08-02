@@ -123,6 +123,7 @@ int getch(void)
 	    "and    $0xffff, %%eax  \n\t"
 	    : "=a" (ch)
 	    );
+    if (((ch&0xff) >= ' ') && ((ch&0xff) <= '~')) ch &= 0xff;
     return ch;
 }
 
