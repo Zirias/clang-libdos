@@ -38,7 +38,7 @@ static size_t _ffmtnbuf(char **buf, const char **s, size_t n)
     return n;
 }
 
-static void _fnumarg(long num, char pad, size_t minwidth, int sign)
+static void _fnumarg(long num, char pad, size_t minwidth, int sign, int hex)
 {
     char tmp[11];
     int i = 0;
@@ -63,11 +63,28 @@ static void _fnumarg(long num, char pad, size_t minwidth, int sign)
     if (pad != '0') pad = ' ';
     do
     {
-	tmp[i++] = (unsigned long)num % 10;
-	num = (unsigned long)num / 10;
+	if (hex)
+	{
+	    tmp[i++] = (unsigned long)num % 16;
+	    num = (unsigned long)num / 16;
+	}
+	else
+	{
+	    tmp[i++] = (unsigned long)num % 10;
+	    num = (unsigned long)num / 10;
+	}
     } while (num > 0);
     while (minwidth-- > i) *s++ = pad;
-    while (--i >= 0) *s++ = tmp[i] + '0';
+    while (--i >= 0)
+    {
+	*s = tmp[i] + '0';
+	if (*s > '9')
+	{
+	    if (hex == 2) *s += 'A' - '9' - 1;
+	    else *s += 'a' - '9' - 1;
+	}
+	++s;
+    }
     *s = 0;
 }
 
@@ -77,9 +94,11 @@ static const char *_fftcharg(const char **s, va_list *ap)
     size_t minwidth = 0;
     farglen len = FAL_DEF;
     unsigned long num;
+    int hex;
 
     while (1)
     {
+	hex = 0;
 	(*s)++;
 	switch (**s)
 	{
@@ -98,10 +117,14 @@ static const char *_fftcharg(const char **s, va_list *ap)
 		    case FAL_L:
 			num = va_arg(*ap, unsigned long);
 		}
-		_fnumarg((long)num, pad, minwidth, 1);
+		_fnumarg((long)num, pad, minwidth, 1, 0);
 		(*s)++;
 		return fpbuf;
 
+	    case 'X':
+		++hex;
+	    case 'x':
+		++hex;
 	    case 'u':
 		switch (len)
 		{
@@ -117,7 +140,7 @@ static const char *_fftcharg(const char **s, va_list *ap)
 		    case FAL_L:
 			num = va_arg(*ap, unsigned long);
 		}
-		_fnumarg((long)num, pad, minwidth, 0);
+		_fnumarg((long)num, pad, minwidth, 0, hex);
 		(*s)++;
 		return fpbuf;
 
