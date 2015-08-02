@@ -57,6 +57,22 @@ Because we can. My goal right now is to implement enough *runtime foo* to get
 my [cursedsnake game](https://github.com/Zirias/cursedsnake) to compile to a
 working `.COM` file. Just for fun.
 
+## How to use?
+
+See the Makefile in this repository. As *link time optimizations* currently
+break your code, the only way is to compile all `libdos` source files together
+with your own source files in a single compiler run. (Don't forget `.COM` is
+limited to 64KB - `0x100`. Linking object files without *link time
+optimizations* therefore isn't really an option.)
+
+**Important**: `core.c` **must** be the first source file on your `clang`
+commandline. It contains the startup code and as `.COM` doesn't have any
+headers, whatever comes first in the binary will be executed at startup.
+
+If you don't need commandline arguments in your program (so, if your main
+function is declared `int main(void)`), pass `-DNOARGV` to save a few bytes in
+the startup code.
+
 ## Footnotes
 
  - [1] The `Linux` kernel uses `GCC` for its bootcode. They came up with a big
