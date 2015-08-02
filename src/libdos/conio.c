@@ -124,6 +124,7 @@ int getch(void)
 	    : "=a" (ch)
 	    );
     if (((ch&0xff) >= ' ') && ((ch&0xff) <= '~')) ch &= 0xff;
+    else ch &= 0xff00;
     return ch;
 }
 
