@@ -46,9 +46,14 @@ refuses to compile.[1] `clang` doesn't complain. As I don't know of any other
  - A non-standard `conio.h` interface aiming to provide an API around the most
    commonly used `int 10h` BIOS routines.
 
+ - A non-standard `rtctimer.h` providing a waitable timer on top of BIOS RTC
+   timer routines. Values are given in microseconds, but the typical precision
+   available is 977 µs.
+
  - very limited `libc` functionality, including the `*printf()` family [2],
-   error handling through `errno.h`, *some* `string.h` functions and *fake*
-   stdio streams just for `stdin`, `stdout` and `stderr`. See the source for
+   error handling through `errno.h`, *some* `string.h` functions, *some*
+   `time.h` functions, a very simple PRNG for `rand()` and *fake* stdio
+   streams just for `stdin`, `stdout` and `stderr`. See the source for
    details.
 
 ## Why?
