@@ -67,12 +67,22 @@ void *memcpy(void *dest, const void *src, size_t n)
     return dest;
 }
 
+void *memset(void *s, int c, size_t n)
+{
+    for (size_t i = 0; i < n; ++i)
+    {
+	((char *)s)[i] = (char)c;
+    }
+    return s;
+}
+
 char *strerror(int errnum)
 {
     switch (errnum)
     {
 	case EINVAL: return "Invalid argument";
 	case ENOSYS: return "Function not implemented";
+	case EBUSY: return "Device or resource busy";
     }
     errno = EINVAL;
     snprintf(strerrunkn, 18, "Unknown error %03d", errnum);

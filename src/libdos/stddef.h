@@ -7,7 +7,8 @@ typedef unsigned short size_t;
 enum
 {
     EINVAL = 1,
-    ENOSYS
+    ENOSYS,
+    EBUSY
 };
 
 #endif
