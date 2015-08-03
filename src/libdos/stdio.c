@@ -61,13 +61,13 @@ static void _fnumarg(long num, char pad, size_t minwidth, int sign, int hex)
 	if (num < 0)
 	{
 	    *s++ = '-';
-	    --minwidth;
+	    if (minwidth) --minwidth;
 	    num = -num;
 	}
 	else if (pad == ' ')
 	{
 	    *s++ = ' ';
-	    --minwidth;
+	    if (minwidth) --minwidth;
 	}
     }
     if (pad != '0') pad = ' ';
