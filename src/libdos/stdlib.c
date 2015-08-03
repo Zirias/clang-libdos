@@ -12,6 +12,7 @@ struct hhdr
 extern char _heap;
 static char *hbreak = &_heap;
 static hhdr hhead = { &_heap, 0 };
+static unsigned int randval = 1;
 
 static void *newchunk(size_t size)
 {
@@ -111,3 +112,16 @@ void *realloc(void *ptr, size_t size)
 	}
     }
 }
+
+void srand(unsigned int seed)
+{
+    randval = seed;
+}
+
+int rand(void)
+{
+    randval *= 1103515245;
+    randval += 12345;
+    return (int)(randval & 0x7fffffff);
+}
+

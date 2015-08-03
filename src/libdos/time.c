@@ -15,6 +15,30 @@ int readrtc(struct tm *tm)
     {
 	__asm__ (
 		"movl	$0, %0		\n\t"
+		"mov	$0x04, %%ah	\n\t"
+		"clc			\n\t"
+		"int	$0x1a		\n\t"
+		"jnc	rtcdsuccess	\n\t"
+		"movl	$1, %0		\n"
+		"rtcdsuccess:		\n\t"
+		: "=rm" (err), "=c" (bcdcy), "=d" (bcdmd)
+		:
+		: "ax"
+		);
+	--try;
+    } while (try && (err || (!bcdcy && !bcdmd)));
+
+    if (err)
+    {
+	errno = EBUSY;
+	return -1;
+    }
+
+    try = 2;
+    do
+    {
+	__asm__ (
+		"movl	$0, %0		\n\t"
 		"mov	$0x02, %%ah	\n\t"
 		"clc			\n\t"
 		"int	$0x1a		\n\t"
@@ -28,27 +52,17 @@ int readrtc(struct tm *tm)
 	--try;
     } while (try && err);
 
-    if (err) return -1;
-
-    try = 2;
-    do 
+    if (err)
     {
-	__asm__ (
-		"movl	$0, %0		\n\t"
-		"mov	$0x04, %%ah	\n\t"
-		"clc			\n\t"
-		"int	$0x1a		\n\t"
-		"jnc	rtcdsuccess	\n\t"
-		"movl	$1, %0		\n"
-		"rtcdsuccess:		\n\t"
-		: "=rm" (err), "=c" (bcdcy), "=d" (bcdmd)
-		:
-		: "ax"
-		);
-	--try;
-    } while (try && err);
+	errno = EBUSY;
+	return -1;
+    }
 
-    if (err) return -1;
+    if (!bcdcy && !bcdmd && !bcdhm && !bcdsd)
+    {
+	errno = ENODEV;
+	return -1;
+    }
 
     tm->tm_year = ((bcdcy >> 12) & 0xf) * 1000 + ((bcdcy >> 8) & 0xf) * 100
 	+ ((bcdcy >> 4) & 0xf) * 10 + (bcdcy & 0xf) - 1900;
@@ -82,12 +96,53 @@ void completetm(struct tm *tm)
 
 int getrtctm(struct tm *tm)
 {
-    if (readrtc(tm) < 0)
-    {
-	errno = EBUSY;
-	return -1;
-    }
+    if (readrtc(tm) < 0) return -1;
     completetm(tm);
     
     return 0;
+}
+
+time_t mktime(struct tm *tm)
+{
+    time_t time = 0;
+
+    if (tm->tm_yday < 0) completetm(tm);
+    int y = tm->tm_year+1900;
+    int s = y < 1970 ? -1 : 1;
+    while (y != 1970)
+    {
+	time += s * ((!(y%4) && (!(y%400) || y%100)) ? 31622400 : 31536000);
+	y -= s;
+    }
+    time += 86400 * tm->tm_yday + 3600 * tm->tm_hour
+	+ 60 * tm->tm_min + tm->tm_sec;
+    return time;
+}
+
+time_t time(time_t *t)
+{
+    struct tm tm;
+    time_t time;
+
+    if (getrtctm(&tm) < 0)
+    {
+	unsigned short cx, dx;
+	__asm__ (
+		"mov	$0, %%ah    \n\t"
+		"int	$0x1a	    \n\t"
+		: "=c" (cx), "=d" (dx)
+		:
+		: "ax"
+		);
+	time = cx;
+	time <<= 16;
+	time |= dx;
+	time = (time_t) ((double)time / 18.2);
+    }
+    else
+    {
+	time = mktime(&tm);
+    }
+    if (t) *t = time;
+    return time;
 }

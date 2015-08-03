@@ -8,6 +8,7 @@ enum
 {
     EINVAL = 1,
     ENOSYS,
+    ENODEV,
     EBUSY
 };
 

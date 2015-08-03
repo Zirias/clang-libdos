@@ -3,6 +3,8 @@
 
 #include "stddef.h"
 
+typedef int time_t;
+
 struct tm
 {
     int tm_sec;
@@ -16,7 +18,10 @@ struct tm
     int tm_isdst;
 };
 
+int readrtc(struct tm *tm);
+void completetm(struct tm *tm);
 int getrtctm(struct tm *tm);
-
+time_t mktime(struct tm *tm);
+time_t time(time_t *t);
 
 #endif
