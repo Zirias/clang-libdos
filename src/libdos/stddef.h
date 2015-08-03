@@ -9,6 +9,7 @@ enum
     EINVAL = 1,
     ENOSYS,
     ENODEV,
+    ECANCELED,
     EBUSY
 };
 

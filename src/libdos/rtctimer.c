@@ -27,6 +27,7 @@ int rtctset(unsigned int usecs)
 	else errno = EBUSY;
 	return -1;
     }
+    timer = 1;
     return 0;
 }
 
@@ -54,13 +55,25 @@ int rtctstop(void)
     return 0;
 }
 
-void rtctwait(void)
+int rtctwait(void)
 {
+    if (!timer)
+    {
+	errno = ECANCELED;
+	return -1;
+    }
     while (!(timer & 0x80)) __asm__ volatile ("hlt");
+    timer = 0;
+    return 0;
 }
 
 int rtctpoll(void)
 {
-    return !!(timer & 0x80);
+    if (timer & 0x80)
+    {
+	timer = 0;
+	return 1;
+    }
+    return 0;
 }
 

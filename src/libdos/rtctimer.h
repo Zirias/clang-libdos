@@ -6,7 +6,7 @@
 /* typical precision: 977 usecs */
 int rtctset(unsigned int usecs);
 int rtctstop(void);
-void rtctwait(void);
+int rtctwait(void);
 int rtctpoll(void);
 
 #endif

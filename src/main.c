@@ -48,8 +48,16 @@ int main(int argc, char **argv)
 	perror("rtctset");
     }
     putstr("waiting for timer ... ");
-    rtctwait();
+    if (rtctwait() < 0)
+    {
+	perror("rtctwait");
+    }
     puts("done.");
+    puts("waiting without running timer:");
+    if (rtctwait() < 0)
+    {
+	perror("rtctwait");
+    }
 err:
     getch();
     setcursor(1);

@@ -83,6 +83,7 @@ char *strerror(int errnum)
 	case EINVAL: return "Invalid argument";
 	case ENOSYS: return "Function not implemented";
 	case ENODEV: return "No such device";
+	case ECANCELED: return "Operation canceled";
 	case EBUSY: return "Device or resource busy";
     }
     errno = EINVAL;
