@@ -5,6 +5,7 @@
 #include <dos.h>
 #include <errno.h>
 #include <time.h>
+#include <rtctimer.h>
 
 int main(int argc, char **argv)
 {
@@ -35,14 +36,22 @@ int main(int argc, char **argv)
 		tm.tm_yday, tm.tm_wday);
     }
     printf("UNIX timestamp: %d\n", time(0));
-    puts("testing rand() (any key for next, ESC to stop):");
-    srand(time(0));
-    int ch;
-    do
+    puts("testing RTC timer (1 second)");
+    if (rtctset(1000000) < 0)
     {
-	printf("rand(): %10d\r", rand());
-	ch = getch();
-    } while (ch != KEY_ESC);
+	perror("rtctset");
+	goto err;
+    }
+    puts("trying to start second timer");
+    if (rtctset(2000000) < 0)
+    {
+	perror("rtctset");
+    }
+    putstr("waiting for timer ... ");
+    rtctwait();
+    puts("done.");
+err:
+    getch();
     setcursor(1);
     setblink(1);
     setpage(0);
