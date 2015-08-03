@@ -1,13 +1,15 @@
-#include "libdos/stdio.h"
-#include "libdos/conio.h"
-#include "libdos/stdlib.h"
-#include "libdos/string.h"
-#include "libdos/dos.h"
-#include "libdos/errno.h"
-#include "libdos/time.h"
+#include <stdio.h>
+#include <conio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <dos.h>
+#include <errno.h>
+#include <time.h>
 
 int main(int argc, char **argv)
 {
+    (void)(argc);
+
     setpage(1);
     gotoxy(0,0);
     clrscr();
