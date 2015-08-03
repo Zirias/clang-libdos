@@ -36,24 +36,8 @@ int main(int argc, char **argv)
 		tm.tm_yday, tm.tm_wday);
     }
     printf("UNIX timestamp: %d\n", time(0));
-    puts("testing RTC timer (1 second)");
-    if (rtctset(1000000) < 0)
-    {
-	perror("rtctset");
-	goto err;
-    }
-    puts("trying to start second timer");
-    if (rtctset(2000000) < 0)
-    {
-	perror("rtctset");
-    }
-    putstr("waiting for timer ... ");
-    if (rtctwait() < 0)
-    {
-	perror("rtctwait");
-    }
-    puts("done.");
-    puts("waiting without running timer:");
+    rtctset(1000000);
+    rtctstop();
     if (rtctwait() < 0)
     {
 	perror("rtctwait");
