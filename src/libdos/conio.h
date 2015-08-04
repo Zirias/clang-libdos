@@ -7,6 +7,7 @@ void setattr(int attr);
 void setscroll(int scroll);
 void setcursor(int show);
 void setblink(int blink);
+void setdelay(int msecs);
 void clrscr(void);
 void gotoxy(int x, int y);
 int getch(void);
@@ -40,6 +41,8 @@ enum keys
     KEY_F8	= 0x4200,
     KEY_F9	= 0x4300,
     KEY_F10	= 0x4400,
+    KEY_F11	= 0x8500,
+    KEY_F12	= 0x8600,
     KEY_C_A	= 0x1e00,
     KEY_C_B	= 0x3000,
     KEY_C_C	= 0x2e00,

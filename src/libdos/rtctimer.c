@@ -1,7 +1,7 @@
 #include "rtctimer.h"
 #include "errno.h"
 
-static unsigned char timer = 0;
+static volatile unsigned char timer = 0;
 
 int rtctset(unsigned int usecs)
 {
@@ -14,9 +14,9 @@ int rtctset(unsigned int usecs)
 	    "mov    $0x8300, %%ax   \n\t"
 	    "clc		    \n\t"
 	    "int    $0x15	    \n\t"
-	    "jnc    rtcsetout	    \n\t"
-	    "mov    %%ah, %0	    \n\t"
-	    "rtcsetout:		    \n\t"
+	    "jnc    1f		    \n\t"
+	    "mov    %%ah, %0	    \n"
+	    "1:			    \n\t"
 	    : "=rm" (err)
 	    : "b" (&timer), "c" (cx), "d" (dx)
 	    : "ax"
@@ -39,9 +39,9 @@ int rtctstop(void)
 	    "mov    $0x8301, %%ax   \n\t"
 	    "clc		    \n\t"
 	    "int    $0x15	    \n\t"
-	    "jnc    rtcstopout	    \n\t"
+	    "jnc    1f		    \n\t"
 	    "movl   $1, %0	    \n"
-	    "rtcstopout:	    \n\t"
+	    "1:			    \n\t"
 	    : "=rm" (err)
 	    :
 	    : "ax"

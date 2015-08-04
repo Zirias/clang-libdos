@@ -1,4 +1,5 @@
 #include "conio.h"
+#include "rtctimer.h"
 
 static int cpage = 0;
 static int crow;
@@ -6,6 +7,7 @@ static int ccol;
 static unsigned short ccsh;
 static int cattr = 0x07;
 static int cscroll = 1;
+static int delay = -1;
 
 void _getcinfo(void)
 {
@@ -101,6 +103,11 @@ void setblink(int blink)
 	    );
 }
 
+void setdelay(int msecs)
+{
+    delay = msecs;
+}
+
 void clrscr(void)
 {
     _scroll(0);
@@ -114,15 +121,58 @@ void gotoxy(int x, int y)
     _gotoxy();
 }
 
-int getch(void)
+static int _getch(void)
 {
     int ch;
-    __asm__ volatile (
-	    "mov    $0x00, %%ah	    \n\t"
+    __asm__ (
+	    "mov    $0x10, %%ah	    \n\t"
 	    "int    $0x16	    \n\t"
 	    "and    $0xffff, %%eax  \n\t"
 	    : "=a" (ch)
 	    );
+    return ch;
+}
+
+static int _checkch(void)
+{
+    int key;
+    __asm__ (
+	    "movl   $0xffffffff, %0 \n\t"
+	    "mov    $0x11, %%ah	    \n\t"
+	    "int    $0x16	    \n\t"
+	    "je	    1f		    \n\t"
+	    "movzwl %%ax, %0	    \n"
+	    "1:			    \n\t"
+	    : "=r" (key)
+	    :
+	    : "ax"
+	    );
+    return key;
+}
+
+int getch(void)
+{
+    int ch;
+
+    if (delay < 0) goto havekey;
+    else if (delay)
+    {
+	if (rtctset((unsigned int)delay * 1000) < 0) return -1;
+	while (!rtctpoll())
+	{
+	    if (_checkch() >= 0)
+	    {
+		rtctstop();
+		goto havekey;
+	    }
+	    __asm__ volatile ("hlt");
+	}
+    }
+    else if (_checkch()) goto havekey;
+    return -1;
+
+havekey:
+    ch = _getch();
     if (((ch&0xff) >= ' ') && ((ch&0xff) <= '~')) ch &= 0xff;
     else ch &= 0xff00;
     return ch;

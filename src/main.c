@@ -42,8 +42,16 @@ int main(int argc, char **argv)
     {
 	perror("rtctwait");
     }
-err:
-    getch();
+    int ch;
+    puts("waiting 5 seconds for each key, press ESC to quit:");
+    setdelay(5000);
+    do
+    {
+	putstr("getch(): ");
+	ch = getch();
+	if (ch < 0) puts("none.");
+	else printf("0x%04x.\n", ch);
+    } while (ch != KEY_ESC);
     setcursor(1);
     setblink(1);
     setpage(0);
