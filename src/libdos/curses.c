@@ -39,6 +39,7 @@ int endwin(void)
     active = 0;
     setpage(0);
     setblink(1);
+    setcursor(1);
     return OK;
 }
 
@@ -137,7 +138,7 @@ int wbkgd(WINDOW *win, chtype ch)
 
 int werase(WINDOW *win)
 {
-    chtype ech = win->bkgd & 0xff00 | 0x20;
+    chtype ech = (win->bkgd & 0xff00) | 0x20;
     for (int i = 0; i < win->rows * win->cols; ++i) win->data[i] = ech;
     return OK;
 }

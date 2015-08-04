@@ -10,7 +10,8 @@ int main(int argc, char **argv)
     (void)(argv);
 
     initscr();
-
+    curs_set(0);
+    
     init_pair(0, COLOR_WHITE, COLOR_BLACK);
     init_pair(1, COLOR_BLACK, COLOR_CYAN);
 
