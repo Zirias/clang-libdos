@@ -10,6 +10,7 @@ void setblink(int blink);
 void setdelay(int msecs);
 void clrscr(void);
 void gotoxy(int x, int y);
+void getxy(int *x, int *y);
 int getch(void);
 void putchrp(char c, int repeat);
 void putch(char c);
@@ -79,5 +80,27 @@ enum keys
 #define KEY_CUT KEY_C_X
 #define KEY_COPY KEY_C_C
 #define KEY_PASTE KEY_C_V
+
+#define COL_PAIR(fg, bg) ((bg)<<4 | (fg))
+
+enum colors
+{
+    COL_BLACK = 0,
+    COL_BLUE,
+    COL_GREEN,
+    COL_CYAN,
+    COL_RED,
+    COL_MAGENTA,
+    COL_BROWN,
+    COL_LIGHTGRAY,
+    COL_GRAY,
+    COL_LIGHTBLUE,
+    COL_LIGHTGREEN,
+    COL_LIGHTCYAN,
+    COL_LIGHTRED,
+    COL_LIGHTMAGENTA,
+    COL_YELLOW,
+    COL_WHITE
+};
 
 #endif

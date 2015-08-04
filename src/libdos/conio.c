@@ -121,6 +121,12 @@ void gotoxy(int x, int y)
     _gotoxy();
 }
 
+void getxy(int *x, int *y)
+{
+    *x = ccol;
+    *y = crow;
+}
+
 static int _getch(void)
 {
     int ch;
