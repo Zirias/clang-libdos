@@ -47,17 +47,20 @@ extern chtype colpairs[];
 
 #define COLOR_PAIR(x) colpairs[(x)]
 
-#define getyx(win, y, x) do { (y) = win->y; (x) = win->x; } while (0)
+#define getyx(win, y, x) do { (y) = (win)->y; (x) = (win)->x; } while (0)
 #define getparyx(win, y, x) do { \
-    if (!win->parent) { (y) = -1; (x) = -1; } \
-    else { (y) = win->row - win->parent->row; \
-	(x) = win->col - win->parent->col; } \
+    if (!((win)->parent)) { (y) = -1; (x) = -1; } \
+    else { (y) = (win)->row - (win)->parent->row; \
+	(x) = (win)->col - (win)->parent->col; } \
     } while (0)
-#define getbegyx(win, y, x) do { (y) = win->row; (x) = win->col; } while (0)
-#define getmaxyx(win, y, x) do { (y) = win->rows; (x) = win->cols; } while (0)
+#define getbegyx(win, y, x) \
+    do { (y) = (win)->row; (x) = (win)->col; } while (0)
+#define getmaxyx(win, y, x) \
+    do { (y) = (win)->rows; (x) = (win)->cols; } while (0)
 
 #define A_BOLD 0x0800U
 #define A_BLINK 0x8000U
+#define A_ALTCHARSET 0
 
 WINDOW *initscr(void);
 int endwin(void);
