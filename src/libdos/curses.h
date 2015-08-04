@@ -3,6 +3,8 @@
 
 #include <conio.h>
 
+typedef unsigned short chtype;
+
 typedef struct WINDOW WINDOW;
 struct WINDOW
 {
@@ -13,12 +15,12 @@ struct WINDOW
     int y;
     int x;
     WINDOW *parent;
-    unsigned short bkgd;
-    unsigned short data[80*25];
+    chtype bkgd;
+    chtype data[80*25];
 };
 
 extern WINDOW * const stdscr;
-extern unsigned char colpairs[];
+extern chtype colpairs[];
 
 #define COLOR_BLACK	0
 #define COLOR_RED	1
@@ -53,8 +55,8 @@ extern unsigned char colpairs[];
 #define getbegyx(win, y, x) do { (y) = win->row; (x) = win->col; } while (0)
 #define getmaxyx(win, y, x) do { (y) = win->rows; (x) = win->cols; } while (0)
 
-#define A_BOLD 0x08
-#define A_BLINK 0x80
+#define A_BOLD 0x0800U
+#define A_BLINK 0x8000U
 
 WINDOW *initscr(void);
 int endwin(void);
@@ -66,6 +68,9 @@ int delwin(WINDOW *win);
 int wrefresh(WINDOW *win);
 int wnoutrefresh(WINDOW *win);
 int doupdate(void);
+
+#define bkgd(x) wbkgd(stdscr, (x))
+int wbkgd(WINDOW *win, chtype ch);
 
 int init_pair(short pair, short f, short b);
 

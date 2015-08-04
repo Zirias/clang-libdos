@@ -184,18 +184,21 @@ havekey:
     return ch;
 }
 
-void putchrp(char c, int repeat)
+void putchrp(int c, int repeat)
 {
+    unsigned short attr;
+    if (c & 0xff00) attr = c >> 8;
+    else attr = cattr;
     __asm__ volatile (
 	    "mov    $0x09, %%ah	    \n\t"
 	    "int    $0x10	    \n\t"
 	    :
-	    : "a" (c), "b" ((cpage << 8) | cattr), "c" (repeat)
+	    : "a" (c), "b" ((cpage << 8) | attr), "c" (repeat)
 	    : "cx"
 	    );
 }
 
-void putch(char c)
+void putch(int c)
 {
     putchrp(c, 1);
 }

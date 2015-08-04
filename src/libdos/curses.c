@@ -6,10 +6,10 @@ static int active = 0;
 static WINDOW std;
 WINDOW * const stdscr = &std;
 
-static unsigned short phys[80*25];
-static unsigned short virt[80*25];
+chtype phys[80*25];
+chtype virt[80*25];
 
-unsigned char colpairs[COLOR_PAIRS];
+chtype colpairs[COLOR_PAIRS];
 
 WINDOW *initscr(void)
 {
@@ -19,6 +19,7 @@ WINDOW *initscr(void)
     std.bkgd = 0x0720;
     std.parent = 0;
     setpage(1);
+    setblink(0);
     setattr(0x07);
     clrscr();
     gotoxy(0,0);
@@ -37,6 +38,7 @@ int endwin(void)
     if (!active) return ERR;
     active = 0;
     setpage(0);
+    setblink(1);
     return OK;
 }
 
@@ -45,7 +47,7 @@ WINDOW *newwin(int nlines, int ncols, int begin_y, int begin_x)
     if (!nlines) nlines = 25 - begin_y;
     if (!ncols) ncols = 80 - begin_x;
     WINDOW *win = malloc(sizeof(WINDOW) +
-	    (nlines * ncols - 80 * 25) * sizeof (unsigned short));
+	    (nlines * ncols - 80 * 25) * sizeof (chtype));
     win->rows = nlines;
     win->cols = ncols;
     win->row = begin_y;
@@ -108,6 +110,28 @@ int init_pair(short pair, short f, short b)
 {
     static const int permut[8] = {0,4,2,6,1,5,3,7};
     if (pair < 0 || pair > COLOR_PAIRS-1) return ERR;
-    colpairs[pair] = COL_PAIR(permut[f], permut[b]);
+    colpairs[pair] = COL_PAIR(permut[f], permut[b]) << 8;
     return OK;
 }
+
+int wbkgd(WINDOW *win, chtype ch)
+{
+    for (int r = 0; r < win->rows; ++r)
+    {
+	for (int c = 0; c < win->cols; ++c)
+	{
+	    if ((win->data[r*win->cols+c] & 0xff) == (win->bkgd & 0xff))
+	    {
+		win->data[r*win->cols+c] = ch;
+	    }
+	    else
+	    {
+		win->data[r*win->cols+c] =
+		    (win->data[r*win->cols+c] & 0xff) | (ch & 0xff00);
+	    }
+	}
+    }
+    win->bkgd = ch;
+    return OK;
+}
+

@@ -12,8 +12,8 @@ void clrscr(void);
 void gotoxy(int x, int y);
 void getxy(int *x, int *y);
 int getch(void);
-void putchrp(char c, int repeat);
-void putch(char c);
+void putchrp(int c, int repeat);
+void putch(int c);
 int putstr(const char *s);
 
 enum keys
