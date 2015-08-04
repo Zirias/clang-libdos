@@ -135,3 +135,10 @@ int wbkgd(WINDOW *win, chtype ch)
     return OK;
 }
 
+int werase(WINDOW *win)
+{
+    chtype ech = win->bkgd & 0xff00 | 0x20;
+    for (int i = 0; i < win->rows * win->cols; ++i) win->data[i] = ech;
+    return OK;
+}
+
