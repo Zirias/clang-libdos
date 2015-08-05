@@ -18,9 +18,9 @@ int readrtc(struct tm *tm)
 		"mov	$0x04, %%ah	\n\t"
 		"clc			\n\t"
 		"int	$0x1a		\n\t"
-		"jnc	rtcdsuccess	\n\t"
+		"jnc	1f		\n\t"
 		"movl	$1, %0		\n"
-		"rtcdsuccess:		\n\t"
+		"1:			\n\t"
 		: "=rm" (err), "=c" (bcdcy), "=d" (bcdmd)
 		:
 		: "ax"
@@ -42,9 +42,9 @@ int readrtc(struct tm *tm)
 		"mov	$0x02, %%ah	\n\t"
 		"clc			\n\t"
 		"int	$0x1a		\n\t"
-		"jnc	rtctsuccess	\n\t"
+		"jnc	1f		\n\t"
 		"movl	$1, %0		\n"
-		"rtctsuccess:		\n\t"
+		"1:			\n\t"
 		: "=rm" (err), "=c" (bcdhm), "=d" (bcdsd)
 		:
 		: "ax"
