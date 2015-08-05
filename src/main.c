@@ -1,10 +1,21 @@
 #include <curses.h>
 #include <math.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 int main(int argc, char **argv)
 {
     (void)(argc);
     (void)(argv);
+
+    char *p;
+    puts("Allocating 4K blocks ...");
+    while ((p = malloc(4096)))
+    {
+	printf("Allocated block at 0x%04x.\n", p);
+    }
+    puts("Allocation failed.");
+    exit(0);
 
     initscr();
     curs_set(0);

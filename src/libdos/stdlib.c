@@ -16,9 +16,13 @@ static unsigned int randval = 1;
 
 static void *newchunk(size_t size)
 {
+    char *stack;
+    __asm__("mov %%esp, %0": "=rm" (stack));
+    if (hbreak + size > stack - 0x40) return 0;
     if (size < 1024) size = 1024;
     hhdr *chunk = (hhdr *)hbreak;
     hbreak += size;
+    if (hbreak > stack - 0x40) hbreak = stack - 0x40;
     chunk->next = hbreak;
     chunk->free = 1;
     return chunk;
@@ -48,7 +52,7 @@ void *malloc(size_t size)
 	}
     }
 
-    hdr->next = newchunk(size + sizeof(hhdr));
+    if (!(hdr->next = newchunk(size + sizeof(hhdr)))) return 0;
     return malloc(size);
 }
 
