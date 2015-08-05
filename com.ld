@@ -8,15 +8,10 @@ SECTIONS
     }
     .data :
     {
-	_data = .;
 	*(.data);
-	_rodata = .;
 	*(.rodata);
-	_common = .;
 	*(COMMON);
-	_bss = .;
 	*(.bss);
-	FILL(0x00000000);
     }
     _heap = ALIGN(4);
 }

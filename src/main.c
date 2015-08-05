@@ -1,24 +1,10 @@
 #include <stdio.h>
 #include <curses.h>
 
-extern char _data;
-extern char _rodata;
-extern char _common;
-extern char _bss;
-extern char _heap;
-
 int main(int argc, char **argv)
 {
     (void)(argc);
     (void)(argv);
-
-    printf("DBG:   _data  0x0%08x\n", &_data);
-    printf("DBG: _rodata  0x0%08x\n", &_rodata);
-    printf("DBG: _common  0x0%08x\n", &_common);
-    printf("DBG:    _bss  0x0%08x\n", &_bss);
-    printf("DBG:   _heap  0x0%08x\n", &_heap);
-
-    getch();
 
     initscr();
     curs_set(0);
