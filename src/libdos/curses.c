@@ -1,6 +1,7 @@
 #include "curses.h"
 
 #include "stdlib.h"
+#include "stdio.h"
 
 static int active = 0;
 static WINDOW std;
