@@ -174,7 +174,7 @@ int getch(void)
 	    __asm__ volatile ("hlt");
 	}
     }
-    else if (_checkch()) goto havekey;
+    else if (_checkch() >= 0) goto havekey;
     return -1;
 
 havekey:

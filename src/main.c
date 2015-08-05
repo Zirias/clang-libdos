@@ -2,20 +2,12 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <conio.h>
 
 int main(int argc, char **argv)
 {
     (void)(argc);
     (void)(argv);
-
-    char *p;
-    puts("Allocating 4K blocks ...");
-    while ((p = malloc(4096)))
-    {
-	printf("Allocated block at 0x%04x.\n", p);
-    }
-    puts("Allocation failed.");
-    exit(0);
 
     initscr();
     curs_set(0);
@@ -46,6 +38,20 @@ int main(int argc, char **argv)
     delwin(field);
     delwin(status);
     endwin();
+
+    putstr("Timeout test (setdelay(0)) -- ESC to quit:\n");
+
+    int c = 0;
+    int i = 0;
+    setdelay(0);
+    while (c != KEY_ESC)
+    {
+	static int spin[] = { '|', '/', '-', '\\' };
+	putch(spin[i++]);
+	if (i == 4) i = 0;
+	c = getch();
+	if (c >= 0) printf("0x%04x\n", c);
+    }
 
     return 0;
 }
