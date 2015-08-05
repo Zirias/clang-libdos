@@ -21,6 +21,7 @@ int main(int argc, char **argv)
     wbkgd(field, COLOR_PAIR(2)|A_BOLD);
     box(field, 0, 0);
     mvwaddstr(field, 2, 12, "EXAMPLE  DIALOG");
+    mvwprintw(field, 4, 2, "Test: %d", 42);
     wrefresh(field);
 
     beep();

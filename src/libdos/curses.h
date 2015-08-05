@@ -2,6 +2,7 @@
 #define LIBDOS_CURSES_H
 
 #include <conio.h>
+#include <stdarg.h>
 
 typedef unsigned short chtype;
 
@@ -143,6 +144,14 @@ int wborder(WINDOW *win, chtype ls, chtype rs, chtype ts, chtype bs,
 #define mvaddnstr(y, x, str, n) mvwaddnstr(stdscr, (y), (x), (str), (n))
 #define mvwaddstr(win, y, x, str) mvwaddnstr((win), (y), (x), (str), -1)
 int mvwaddnstr(WINDOW *win, int y, int x, const char *str, int n);
+
+#define printw(fmt, ...) wprintw(stdscr, (fmt), __VA_ARGS__)
+#define wprintw(win, fmt, ...) mvwprintw((win), -1, -1, (fmt), __VA_ARGS__)
+#define mvprintw(y, x, fmt, ...) \
+    mvwprintw(stdscr, (y), (x), (fmt), __VA_ARGS__)
+int mvwprintw(WINDOW *win, int y, int x, const char *fmt, ...);
+#define vwprintw(win, fmt, varglist) vw_printw((win), (fmt), (varglist))
+int vw_printw(WINDOW *win, const char *fmt, va_list varglist);
 
 int init_pair(short pair, short f, short b);
 
