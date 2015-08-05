@@ -125,3 +125,22 @@ int rand(void)
     return (int)(randval & 0x7fffffff);
 }
 
+float _invSqrt(float x)
+{
+    float xhalf = 0.5f*x;
+    union
+    {
+	float x;
+	int i;
+    } u;
+    u.x = x;
+    u.i = 0x5f3759df - (u.i >> 1);
+    u.x = u.x * (1.5f - xhalf * u.x * u.x);
+    return u.x;
+}
+
+double sqrt(double x)
+{
+    return 1.0f/_invSqrt(x);
+}
+

@@ -1,4 +1,5 @@
 #include <curses.h>
+#include <math.h>
 
 int main(int argc, char **argv)
 {
@@ -22,6 +23,8 @@ int main(int argc, char **argv)
     box(field, 0, 0);
     mvwaddstr(field, 2, 12, "EXAMPLE  DIALOG");
     mvwprintw(field, 4, 2, "Test: %d", 42);
+    double sqr2 = sqrt(2);
+    mvwprintw(field, 5, 2, "Testing sqrt(): %d", (int)(sqr2 * 100000.0));
     wrefresh(field);
 
     beep();
