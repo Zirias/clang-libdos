@@ -128,6 +128,13 @@ int waddch(WINDOW *win, chtype ch);
 #define mvaddch(y, x, ch) mvwaddch(stdscr, (y), (x), (ch))
 int mvwaddch(WINDOW *win, int y, int x, const chtype ch);
 
+#define border(ls, rs, ts, bs, tl, tr, bl, br) \
+    wborder(stdscr, (ls), (rs), (ts), (bs), (tl), (tr), (bl), (br))
+#define box(win, verch, horch) \
+    wborder((win), (verch), (verch), (horch), (horch), 0, 0, 0, 0)
+int wborder(WINDOW *win, chtype ls, chtype rs, chtype ts, chtype bs,
+	chtype tl, chtype tr, chtype bl, chtype br);
+
 int init_pair(short pair, short f, short b);
 
 #endif

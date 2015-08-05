@@ -204,3 +204,38 @@ int mvwaddch(WINDOW *win, int y, int x, const chtype ch)
     return waddch(win, ch);
 }
 
+int wborder(WINDOW *win, chtype ls, chtype rs, chtype ts, chtype bs,
+	chtype tl, chtype tr, chtype bl, chtype br)
+{
+    if (!ls) ls = ACS_VLINE;
+    if (!rs) rs = ACS_VLINE;
+    if (!ts) ts = ACS_HLINE;
+    if (!bs) bs = ACS_HLINE;
+    if (!tl) tl = ACS_ULCORNER;
+    if (!tr) tr = ACS_URCORNER;
+    if (!bl) bl = ACS_LLCORNER;
+    if (!br) br = ACS_LRCORNER;
+
+    win->data[0] = (win->data[0]&0xff00) | tl;
+    win->data[win->cols-1] = (win->data[win->cols-1]&0xff00) | tr;
+    win->data[(win->rows-1)*win->cols] =
+	(win->data[(win->rows-1)*win->cols]&0xff00) | bl;
+    win->data[win->rows*win->cols-1] =
+	(win->data[win->rows*win->cols-1]&0xff00) | br;
+
+    for (int r = 1; r < win->rows-1;)
+    {
+	win->data[r*win->cols] = (win->data[r*win->cols]&0xff00) | ls;
+	++r;
+	win->data[r*win->cols-1] = (win->data[r*win->cols-1]&0xff00) | rs;
+    }
+
+    for (int c = 1; c < win->cols-1; ++c)
+    {
+	win->data[c] = (win->data[c]&0xff00) | ts;
+	win->data[(win->rows-1)*win->cols+c] =
+	    (win->data[(win->rows-1)*win->cols+c]&0xff00) | bs;
+    }
+
+    return OK;
+}
