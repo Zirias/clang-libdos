@@ -239,3 +239,29 @@ int wborder(WINDOW *win, chtype ls, chtype rs, chtype ts, chtype bs,
 
     return OK;
 }
+
+int mvwaddnstr(WINDOW *win, int y, int x, const char *str, int n)
+{
+    int wr = 0;
+    const char *p = str;
+    int idx;
+
+    if (y >= 0 && x >= 0) wmove(win, y, x);
+
+    idx = win->cols * win->y + win->x;
+    while (*p && wr != n)
+    {
+	win->data[idx] = (win->data[idx]&0xff00) | (unsigned char)*p++;
+	++idx;
+	++wr;
+    }
+    win->x += wr;
+    while (win->x > win->cols)
+    {
+	if (win->y < win->rows-2) ++win->y;
+	win->x -= win->cols;
+    }
+
+    return OK;
+}
+

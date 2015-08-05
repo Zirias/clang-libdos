@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <curses.h>
 
 int main(int argc, char **argv)
@@ -17,9 +16,11 @@ int main(int argc, char **argv)
     WINDOW *field = newwin(10, 40, 5, 20);
 
     wbkgd(status, COLOR_PAIR(1)|A_BLINK);
+    mvwaddstr(status, 0, 1, "example title bar");
     wrefresh(status);
     wbkgd(field, COLOR_PAIR(2)|A_BOLD);
     box(field, 0, 0);
+    mvwaddstr(field, 2, 12, "EXAMPLE  DIALOG");
     wrefresh(field);
 
     beep();

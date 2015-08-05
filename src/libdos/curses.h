@@ -135,6 +135,15 @@ int mvwaddch(WINDOW *win, int y, int x, const chtype ch);
 int wborder(WINDOW *win, chtype ls, chtype rs, chtype ts, chtype bs,
 	chtype tl, chtype tr, chtype bl, chtype br);
 
+#define addstr(str) waddstr(stdscr, (str))
+#define addnstr(str, n) waddnstr(stdscr, (str), (n))
+#define waddstr(win, str) waddnstr((win), (str), -1)
+#define waddnstr(win, str, n) mvwaddnstr((win), -1, -1, (str), (n))
+#define mvaddstr(y, x, str) mvwaddstr(stdscr, (y), (x), (str))
+#define mvaddnstr(y, x, str, n) mvwaddnstr(stdscr, (y), (x), (str), (n))
+#define mvwaddstr(win, y, x, str) mvwaddnstr((win), (y), (x), (str), -1)
+int mvwaddnstr(WINDOW *win, int y, int x, const char *str, int n);
+
 int init_pair(short pair, short f, short b);
 
 #endif
