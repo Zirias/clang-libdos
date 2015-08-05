@@ -6,8 +6,8 @@ static int active = 0;
 static WINDOW std;
 WINDOW * const stdscr = &std;
 
-chtype phys[80*25];
-chtype virt[80*25];
+static chtype phys[80*25];
+static chtype virt[80*25];
 
 chtype colpairs[COLOR_PAIRS];
 

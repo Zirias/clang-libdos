@@ -8,11 +8,13 @@ SECTIONS
     }
     .data :
     {
+	_data = .;
 	*(.data);
+	_rodata = .;
 	*(.rodata);
-    }
-    .bss :
-    {
+	_common = .;
+	*(COMMON);
+	_bss = .;
 	*(.bss);
 	FILL(0x00000000);
     }

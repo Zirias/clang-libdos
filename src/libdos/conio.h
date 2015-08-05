@@ -15,6 +15,8 @@ int getch(void);
 void putchrp(int c, int repeat);
 void putch(int c);
 int putstr(const char *s);
+void beep(void);
+void flash(void);
 
 enum keys
 {

@@ -241,3 +241,45 @@ int putstr(const char *s)
     return l;
 }
 
+void beep(void)
+{
+    __asm__ volatile(
+	    "mov    $0x0e07, %%ax   \n\t"
+	    "int    $0x10	    \n\t"
+	    :
+	    : "b" (cpage << 8)
+	    : "ax"
+	    );
+}
+
+void flash(void)
+{
+    int srow = crow;
+    int scol = ccol;
+    for (int i = 0; i < 2; ++i)
+    {
+	for (crow = 0; crow < 25; crow ++)
+	{
+	    for (ccol = 0; ccol < 80; ccol ++)
+	    {
+		_gotoxy();
+		__asm__ volatile (
+			"mov    $0x08, %%ah	\n\t"
+			"int    $0x10		\n\t"
+			"ror    $4, %%ah        \n\t"
+			"mov    %%ah, %%bl	\n\t"
+			"mov    $1, %%cx	\n\t"
+			"mov    $0x09, %%ah	\n\t"
+			"int    $0x10		\n\t"
+			:
+			: "b" (cpage << 8)
+			: "ax", "cx"
+			);
+	    }
+	}
+    }
+    crow = srow;
+    ccol = scol;
+    _gotoxy();
+}
+
