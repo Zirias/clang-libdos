@@ -56,6 +56,12 @@ refuses to compile.[1] `clang` doesn't complain. As I don't know of any other
    streams just for `stdin`, `stdout` and `stderr`. See the source for
    details.
 
+ - **very** limited `curses.h` emulation, which could be enough for very basic
+   curses-based programs. Handling of WINDOWs and comparison of physical and
+   virtual screen *are* implemented, but be warned that this consumes memory
+   ... a precious thing in a `.COM` file limited to 64KB. So, if you don't
+   need curses, just leave `curses.c` out when compiling.
+
 ## Why?
 
 Because we can. My goal right now is to implement enough *runtime foo* to get
@@ -87,9 +93,9 @@ the startup code.
        DOS application, you probably don't want to do such a thing.
 
  - [2] In the current implementation, the only format specifiers allowed are
-       `s`, `d`, `u`, `x` and `X`. Flags for padding (` ` and `0`) and
+       `s`, `c`, `d`, `u`, `x` and `X`. Flags for padding (` ` and `0`) and
        field-widths are understood as well as length specifiers from `hh` to
        `l`. No advanced features of `printf()` are supported and there's
        barely any error-checking, so be careful with your format strings. For
-       `s`, any flags and field-widths are currently ignored.
+       `s` and `c`, any flags and field-widths are currently ignored.
 
