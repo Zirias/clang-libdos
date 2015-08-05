@@ -40,6 +40,7 @@ extern chtype colpairs[];
 #define noecho()
 #define keypad(x, y)
 #define start_color()
+#define leaveok(x, y)
 
 #define ERR -1
 #define OK 0
@@ -47,16 +48,19 @@ extern chtype colpairs[];
 
 #define COLOR_PAIR(x) colpairs[(x)]
 
-#define getyx(win, y, x) do { (y) = (win)->y; (x) = (win)->x; } while (0)
-#define getparyx(win, y, x) do { \
-    if (!((win)->parent)) { (y) = -1; (x) = -1; } \
-    else { (y) = (win)->row - (win)->parent->row; \
-	(x) = (win)->col - (win)->parent->col; } \
+#define getyx(win, uy, ux) do { (uy) = (win)->y; (ux) = (win)->x; } while (0)
+#define getparyx(win, uy, ux) do { \
+    if (!((win)->parent)) { (uy) = -1; (ux) = -1; } \
+    else { (uy) = (win)->row - (win)->parent->row; \
+	(ux) = (win)->col - (win)->parent->col; } \
     } while (0)
-#define getbegyx(win, y, x) \
-    do { (y) = (win)->row; (x) = (win)->col; } while (0)
-#define getmaxyx(win, y, x) \
-    do { (y) = (win)->rows; (x) = (win)->cols; } while (0)
+#define getbegyx(win, uy, ux) \
+    do { (uy) = (win)->row; (ux) = (win)->col; } while (0)
+#define getmaxyx(win, uy, ux) \
+    do { (uy) = (win)->rows; (ux) = (win)->cols; } while (0)
+
+#define wmove(win, uy, ux) do { (win)->y = (uy); (win)->x = (ux); } while (0)
+#define move(uy, ux) wmove((uy), (ux))
 
 #define A_BOLD 0x0800U
 #define A_BLINK 0x8000U
@@ -66,6 +70,8 @@ WINDOW *initscr(void);
 int endwin(void);
 
 WINDOW *newwin(int nlines, int ncols, int begin_y, int begin_x);
+WINDOW *subwin(WINDOW *orig, int nlines, int nclos, int begin_y, int begin_x);
+
 int delwin(WINDOW *win);
 
 #define refresh() wrefresh(stdscr)
@@ -76,8 +82,15 @@ int doupdate(void);
 #define bkgd(x) wbkgd(stdscr, (x))
 int wbkgd(WINDOW *win, chtype ch);
 
+#define clear() wclear(stdscr)
+#define wclear(x) werase((x))
 #define erase() werase(stdscr)
 int werase(WINDOW *win);
+
+#define addch(x) waddch(stdscr, (x))
+int waddch(WINDOW *win, chtype ch);
+#define mvaddch(y, x, ch) mvwaddch(stdscr, (y), (x), (ch))
+int mvwaddch(WINDOW *win, int y, int x, const chtype ch);
 
 int init_pair(short pair, short f, short b);
 

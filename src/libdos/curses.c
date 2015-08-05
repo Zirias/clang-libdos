@@ -64,6 +64,23 @@ WINDOW *newwin(int nlines, int ncols, int begin_y, int begin_x)
     return win;
 }
 
+WINDOW *subwin(WINDOW *orig, int nlines, int ncols, int begin_y, int begin_x)
+{
+    if (orig->parent) return 0;
+    if (!nlines) nlines = 25 - begin_y;
+    if (!ncols) ncols = 80 - begin_x;
+    WINDOW *win = malloc(sizeof(WINDOW) - 80*25*sizeof(chtype));
+    win->rows = nlines;
+    win->cols = ncols;
+    win->row = begin_y;
+    win->col = begin_x;
+    win->y = 0;
+    win->x = 0;
+    win->parent = orig;
+    win->bkgd = win->parent->bkgd;
+    return win;
+}
+
 int delwin(WINDOW *win)
 {
     if (!win) return ERR;
@@ -73,6 +90,7 @@ int delwin(WINDOW *win)
 
 int wnoutrefresh(WINDOW *win)
 {
+    if (win->parent) return (wnoutrefresh(win->parent));
     for (int r = 0; r < win->rows; ++r)
     {
 	for (int c = 0; c < win->cols; ++c)
@@ -139,7 +157,50 @@ int wbkgd(WINDOW *win, chtype ch)
 int werase(WINDOW *win)
 {
     chtype ech = (win->bkgd & 0xff00) | 0x20;
+    if (win->parent)
+    {
+	for (int r = win->parent->row; r < win->parent->row + win->rows; ++r)
+	{
+	    for (int c = win->parent->col;
+		    c < win->parent->col + win->cols; ++c)
+	    {
+		win->parent->data[r*win->parent->cols + c] = ech;
+	    }
+	}
+	return OK;
+    }
     for (int i = 0; i < win->rows * win->cols; ++i) win->data[i] = ech;
     return OK;
+}
+
+int waddch(WINDOW *win, const chtype ch)
+{
+    if (win->parent)
+    {
+	return mvwaddch(win->parent, win->row - win->parent->row + win->y,
+		win->col - win->parent->col + win->x, ch);
+    }
+    if (ch & 0xff00)
+    {
+	win->data[win->y * win->cols + win->x] = ch;
+    }
+    else
+    {
+	win->data[win->y * win->cols + win->x] =
+	    (win->data[win->y * win->cols + win->x] & 0xff00) | ch;
+    }
+    ++win->x;
+    if (win->x >= win->cols)
+    {
+	win->x = 0;
+	if (win->y < win->rows-1) ++win->y;
+    }
+    return OK;
+}
+
+int mvwaddch(WINDOW *win, int y, int x, const chtype ch)
+{
+    wmove(win, y, x);
+    return waddch(win, ch);
 }
 
