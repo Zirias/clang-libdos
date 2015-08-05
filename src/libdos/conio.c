@@ -225,7 +225,7 @@ int putstr(const char *s)
 		break;
 
 	    default:
-		putch(*p);
+		putch((unsigned char)*p);
 		if (++ccol > 79)
 		{
 		    ccol = 0;

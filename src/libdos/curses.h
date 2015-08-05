@@ -66,6 +66,42 @@ extern chtype colpairs[];
 #define A_BLINK 0x8000U
 #define A_ALTCHARSET 0
 
+enum acs
+{
+    ACS_BLOCK	    = 0xdb,
+    ACS_BOARD	    = 0xfe,
+    ACS_BTEE	    = 0xc1,
+    ACS_BULLET	    = 0x07,
+    ACS_CKBOARD	    = 0xb1,
+    ACS_DARROW	    = 0x19,
+    ACS_DEGREE	    = 0xf8,
+    ACS_DIAMOND	    = 0x04,
+    ACS_GEQUAL	    = 0x3e,
+    ACS_HLINE	    = 0xc4,
+    ACS_LANTERN	    = 0x0f,
+    ACS_LARROW	    = 0x1b,
+    ACS_LEQUAL	    = 0x3c,
+    ACS_LLCORNER    = 0xc0,
+    ACS_LRCORNER    = 0xd9,
+    ACS_LTEE	    = 0xc3,
+    ACS_NEQUAL	    = 0x21,
+    ACS_PI	    = 0x14,
+    ACS_PLMINUS	    = 0xf1,
+    ACS_PLUS	    = 0x2b,
+    ACS_RARROW	    = 0x1a,
+    ACS_RTEE	    = 0xb4,
+    ACS_S1	    = 0xee,
+    ACS_S3	    = 0xc4,
+    ACS_S7	    = 0xc4,
+    ACS_S9	    = 0xf2,
+    ACS_STERLING    = 0x66,
+    ACS_TTEE	    = 0xc2,
+    ACS_UARROW	    = 0x18,
+    ACS_ULCORNER    = 0xda,
+    ACS_URCORNER    = 0xbf,
+    ACS_VLINE	    = 0xb3
+};
+
 WINDOW *initscr(void);
 int endwin(void);
 

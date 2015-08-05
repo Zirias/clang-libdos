@@ -158,6 +158,12 @@ static const char *_fftcharg(const char **s, va_list *ap)
 		(*s)++;
 		return va_arg(*ap, const char*);
 
+	    case 'c':
+		(*s)++;
+		fpbuf[0] = (unsigned char) va_arg(*ap, unsigned int);
+		fpbuf[1] = 0;
+		return fpbuf;
+
 	    case '0':
 		if (minwidth) minwidth *= 10;
 		else pad = '0';
