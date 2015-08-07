@@ -143,15 +143,3 @@ int rand(void)
     return (int)((randval / 65536) & 0x7fffffff);
 }
 
-double sqrt(double x)
-{
-    __asm__ (
-            "fldl   %0      \n\t"
-            "fsqrt          \n\t"
-            "fstl   %0      \n\t"
-            : "=m" (x)
-            : "m" (x)
-            );
-    return x;
-}
-
