@@ -1,6 +1,11 @@
 #include "stdlib.h"
 
 #include "string.h"
+#include "errno.h"
+
+#ifndef MALLOC_STACK_GAP
+#define MALLOC_STACK_GAP 0x40
+#endif
 
 #define HDR_CNEXT(x) ((char *)((unsigned int)(x)->parts.next))
 #define HDR_HNEXT(x) ((hhdr *)((unsigned int)(x)->parts.next))
@@ -25,11 +30,11 @@ unsigned short newchunk(size_t size)
 {
     char *stack;
     __asm__("mov %%esp, %0": "=rm" (stack));
-    if (hbreak + size > stack - 0x40) return 0;
+    if (hbreak + size > stack - MALLOC_STACK_GAP) return 0;
     if (size < 1024) size = 1024;
     hhdr *chunk = (hhdr *)hbreak;
     hbreak += size;
-    if (hbreak > stack - 0x40) hbreak = stack - 0x40;
+    if (hbreak > stack - MALLOC_STACK_GAP) hbreak = stack - MALLOC_STACK_GAP;
     chunk->ptr = hbreak;
     chunk->parts.free = 1;
     return (unsigned short)chunk;
@@ -59,7 +64,11 @@ void *malloc(size_t size)
 	}
     }
 
-    if (!(hdr->parts.next = newchunk(size + sizeof(hhdr)))) return 0;
+    if (!(hdr->parts.next = newchunk(size + sizeof(hhdr))))
+    {
+        errno = ENOMEM;
+        return 0;
+    }
     return malloc(size);
 }
 

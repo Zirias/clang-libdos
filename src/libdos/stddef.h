@@ -10,7 +10,8 @@ enum
     ENOSYS,
     ENODEV,
     ECANCELED,
-    EBUSY
+    EBUSY,
+    ENOMEM
 };
 
 #endif

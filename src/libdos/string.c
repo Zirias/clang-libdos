@@ -2,9 +2,6 @@
 #include "errno.h"
 #include "stdio.h"
 
-static char *strtokptr = 0;
-static char strerrunkn[18];
-
 size_t strlen(const char *s)
 {
     size_t l = 0;
@@ -31,6 +28,7 @@ static int _isinstr(const char c, const char *str)
 
 char *strtok(char *str, const char *delim)
 {
+    static char *strtokptr = 0;
     char *p;
     int t = 0;
 
@@ -83,6 +81,7 @@ void *memset(void *s, int c, size_t n)
 
 char *strerror(int errnum)
 {
+    static char unknown[18];
     switch (errnum)
     {
 	case EINVAL: return "Invalid argument";
@@ -90,8 +89,9 @@ char *strerror(int errnum)
 	case ENODEV: return "No such device";
 	case ECANCELED: return "Operation canceled";
 	case EBUSY: return "Device or resource busy";
+	case ENOMEM: return "Not enough space";
     }
     errno = EINVAL;
-    snprintf(strerrunkn, 18, "Unknown error %03d", errnum);
-    return strerrunkn;
+    snprintf(unknown, 18, "Unknown error %03d", errnum);
+    return unknown;
 }
