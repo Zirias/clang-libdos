@@ -18,9 +18,15 @@ $(BINARY): $(ALLSRC:.c=.o) | $(LDSCRIPT)
 	clang -o$@ $(CFLAGS) $(LDFLAGS) $^
 
 %.o: %.c
-	clang -c -o$@ $(CFLAGS) $<
+
+%.o: %.s
+	echo \\t.code16 | cat - $< | as --32 -march=i586 -o$@
+
+%.s: %.c
+	clang -S -o$@ $(CFLAGS) $<
 
 clean:
 	rm -f $(ALLSRC:.c=.o)
+	rm -f $(ALLSRC:.c=.s)
 
 .PHONY: all clean $(BINARY)
