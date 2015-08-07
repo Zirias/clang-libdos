@@ -32,7 +32,8 @@ int main(int argc, char **argv)
     mvwaddstr(dlg, 2, 12, "EXAMPLE  DIALOG");
     mvwprintw(dlg, 4, 2, "Test: %d", 42);
     double sqr2 = sqrt(2);
-    mvwprintw(dlg, 5, 2, "Testing sqrt(): %d", (int)(sqr2 * 100000.0));
+    mvwprintw(dlg, 5, 2, "Testing sqrt(): %u",
+	    (unsigned int)(sqr2 * 1000000000.0));
     wrefresh(dlg);
     delwin(dlg);
 
