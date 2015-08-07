@@ -145,17 +145,13 @@ int rand(void)
 
 double sqrt(double x)
 {
-    double xhalf = 0.5*x;
-    union
-    {
-	float x;
-	int i;
-    } u;
-    u.x = x;
-    u.i = 0x5f3759df - (u.i >> 1);
-    x = u.x * (1.5 - xhalf * u.x * u.x);
-    x = x * (1.5 - xhalf * x * x);
-    x = x * (1.5 - xhalf * x * x);
-    return 1.0/x;
+    __asm__ (
+            "fldl   %0      \n\t"
+            "fsqrt          \n\t"
+            "fstl   %0      \n\t"
+            : "=m" (x)
+            : "m" (x)
+            );
+    return x;
 }
 
