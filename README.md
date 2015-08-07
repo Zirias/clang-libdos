@@ -28,12 +28,10 @@ things were even more complicated.
 
 Well, `GCC` seems still a bit more *buggy* with `-m16` than `clang`. `clang`
 already does a great job optimizing the code without breaking it for *real
-mode*. Unfortunately, this doesn't hold for *link time optimizations*, they
-**will** break your program (as soon as it's non-trivial) even with `clang`.
-Apart from that, there's one issue: *real mode* applications typically use
-BIOS and DOS *interrupt routines*. Some BIOSes are buggy. There's at least one
-routine (the one for scrolling the console, so something needed regularly) I
-know of that clobbers the `ebp` (base pointer for the current stack frame)
+mode*. Apart from that, there's one issue: *real mode* applications typically
+use BIOS and DOS *interrupt routines*. Some BIOSes are buggy. There's at least
+one routine (the one for scrolling the console, so something needed regularly)
+I know of that clobbers the `ebp` (base pointer for the current stack frame)
 register on buggy BIOSes. Declaring that in your inline assembly, `GCC` just
 refuses to compile.[1] `clang` doesn't complain. As I don't know of any other
 *modern* compilers targeting *real mode*, this project is now tied to `clang`.
@@ -48,7 +46,9 @@ refuses to compile.[1] `clang` doesn't complain. As I don't know of any other
 
  - A non-standard `rtctimer.h` providing a waitable timer on top of BIOS RTC
    timer routines. Values are given in microseconds, but the typical precision
-   available is 977 µs.
+   available is 977 µs. This doesn't seem to work with every BIOS (works in
+   DOSBox, *doesn't* work in VirtualBox), so maybe replace with some assembly
+   implementation using the RTC directly later ...
 
  - very limited `libc` functionality, including the `*printf()` family [2],
    error handling through `errno.h`, *some* `string.h` functions, *some*
@@ -60,29 +60,34 @@ refuses to compile.[1] `clang` doesn't complain. As I don't know of any other
    curses-based programs. Handling of WINDOWs and comparison of physical and
    virtual screen *are* implemented, but be warned that this consumes memory
    ... a precious thing in a `.COM` file limited to 64KB. So, if you don't
-   need curses, just leave `curses.c` out when compiling.
+   need curses, just leave `curses.o` out when linking.
 
 ## Why?
 
 Because we can. My goal right now is to implement enough *runtime foo* to get
 my [cursedsnake game](https://github.com/Zirias/cursedsnake) to compile to a
-working `.COM` file. Just for fun.
+working `.COM` file. Just for fun. **Update 2015-08-07**: This is finally
+working. Have a look at the `libdos.mk` Makefile over there on how to use this
+project in a real-world app/game.
 
 ## How to use?
 
-See the Makefile in this repository. As *link time optimizations* currently
-break your code, the only way is to compile all `libdos` source files together
-with your own source files in a single compiler run. (Don't forget `.COM` is
-limited to 64KB - `0x100`. Linking object files without *link time
-optimizations* therefore isn't really an option.)
+See the Makefile in this repository. It has some options enabled to save space
+like passing up to 3 arguments in registers and letting the linker eliminate
+unused code and data. At the time being, the `clang` available in Debian
+stable messes up at the assembler step with at least one instruction (`lea`)
+when compiling for *real mode*. This would lead to strange 
+*[heisenbugs](http://stackoverflow.com/questions/31865276/)* in the resulting
+binary. So, for now, the Makefile lets `clang` only create optimized assembly
+source, which is then passed to the GNU assembler.
 
-**Important**: `core.c` **must** be the first source file on your `clang`
-commandline. It contains the startup code and as `.COM` doesn't have any
+**Important**: `core.o` **must** be the first object file on your linking
+stage commandline. It contains the startup code and as `.COM` doesn't have any
 headers, whatever comes first in the binary will be executed at startup.
 
 If you don't need commandline arguments in your program (so, if your main
-function is declared `int main(void)`), pass `-DNOARGV` to save a few bytes in
-the startup code.
+function is declared `int main(void)`), pass `-DNOARGV` while compiling to
+save a few bytes in the startup code.
 
 ## Footnotes
 
