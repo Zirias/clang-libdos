@@ -2,19 +2,26 @@
 
 #include "string.h"
 
-typedef struct hhdr hhdr;
-struct hhdr
-{
-    void *next;
-    int free;
+#define HDR_CNEXT(x) ((char *)((unsigned int)(x)->parts.next))
+#define HDR_HNEXT(x) ((hhdr *)((unsigned int)(x)->parts.next))
+#define HDR_FREE(x) ((x)->parts.free)
+
+typedef union hhdr hhdr;
+union hhdr {
+    void *ptr;
+    struct
+    {
+        unsigned short next;
+        unsigned short free;
+    } parts;
 };
 
 extern char _heap;
 static char *hbreak = &_heap;
-static hhdr hhead = { &_heap, 0 };
+static hhdr hhead = { &_heap };
 static unsigned long long int randval = 1;
 
-static void *newchunk(size_t size)
+unsigned short newchunk(size_t size)
 {
     char *stack;
     __asm__("mov %%esp, %0": "=rm" (stack));
@@ -23,9 +30,9 @@ static void *newchunk(size_t size)
     hhdr *chunk = (hhdr *)hbreak;
     hbreak += size;
     if (hbreak > stack - 0x40) hbreak = stack - 0x40;
-    chunk->next = hbreak;
-    chunk->free = 1;
-    return chunk;
+    chunk->ptr = hbreak;
+    chunk->parts.free = 1;
+    return (unsigned short)chunk;
 }
 
 void *malloc(size_t size)
@@ -34,25 +41,25 @@ void *malloc(size_t size)
     if (size % sizeof(hhdr)) size += sizeof(hhdr) - (size % sizeof(hhdr));
 
     hhdr *hdr = &hhead;
-    while ((char *)hdr->next < hbreak)
+    while (HDR_CNEXT(hdr) < hbreak)
     {
-	hdr = hdr->next;
-	if (hdr->free && 
-		(char *)hdr->next - (char *)hdr - sizeof(hhdr) >= size)
+	hdr = HDR_HNEXT(hdr);
+	if (HDR_FREE(hdr) && 
+		HDR_CNEXT(hdr) - (char *)hdr - sizeof(hhdr) >= size)
 	{
-	    if ((char *)hdr->next - (char *)hdr - 2*sizeof(hhdr) > size)
+	    if (HDR_CNEXT(hdr) - (char *)hdr - 2*sizeof(hhdr) > size)
 	    {
 		hhdr *hdr2 = (hhdr *)((char *)hdr + sizeof(hhdr) + size);
-		hdr2->free = 1;
-		hdr2->next = hdr->next;
-		hdr->next = hdr2;
+		hdr2->parts.free = 1;
+		hdr2->parts.next = hdr->parts.next;
+		hdr->parts.next = (unsigned short)hdr2;
 	    }
-	    hdr->free = 0;
+	    hdr->parts.free = 0;
 	    return (char *)hdr + sizeof(hhdr);
 	}
     }
 
-    if (!(hdr->next = newchunk(size + sizeof(hhdr)))) return 0;
+    if (!(hdr->parts.next = newchunk(size + sizeof(hhdr)))) return 0;
     return malloc(size);
 }
 
@@ -60,19 +67,19 @@ void free(void *ptr)
 {
     if (!ptr) return;
     hhdr *hdr = (hhdr *)((char *)ptr - sizeof(hhdr));
-    hdr->free = 1;
-    if ((void *)hdr != hhead.next)
+    hdr->parts.free = 1;
+    if (hdr != (hhdr *)hhead.ptr)
     {
-	hhdr *hdr2 = hhead.next;
-	while (hdr2->next != hdr) hdr2 = hdr2->next;
-	if (hdr2->free) hdr = hdr2;
+	hhdr *hdr2 = (hhdr *)hhead.ptr;
+	while (hdr2->parts.next != (unsigned short)hdr) hdr2 = HDR_HNEXT(hdr2);
+	if (HDR_FREE(hdr2)) hdr = hdr2;
     }
-    hhdr *next = hdr->next;
+    hhdr *next = HDR_HNEXT(hdr);
     while ((char *)next < hbreak)
     {
-	if (!next->free) break;
-	hdr->next = next;
-	next = next->next;
+	if (!HDR_FREE(next)) break;
+	hdr->parts.next = (unsigned short)next;
+	next = HDR_HNEXT(next);
     }
     if ((char *)next == hbreak) hbreak = (char *)hdr;
 }
@@ -87,30 +94,28 @@ void *realloc(void *ptr, size_t size)
     }
     if (size % sizeof(hhdr)) size += sizeof(hhdr) - (size % sizeof(hhdr));
     hhdr *hdr = (hhdr *)((char *)ptr - sizeof(hhdr));
-    size_t oldsize = (char *)hdr->next - (char *)ptr;
+    size_t oldsize = HDR_CNEXT(hdr) - (char *)ptr;
     if (size <= oldsize)
     {
 	if (oldsize - size <= 2*sizeof(hhdr)) return ptr;
 	hhdr *hdr2 = (hhdr *)((char *)ptr + size);
-	hdr2->free = 0;
-	hdr2->next = hdr->next;
-	hdr->next = hdr2;
+	hdr2->ptr = hdr->ptr;
+	hdr->ptr = hdr2;
 	free((char *)hdr2 + sizeof(hhdr));
 	return ptr;
     }
     else
     {
-	if ((char *)hdr->next < hbreak
-		&& ((hhdr *)hdr->next)->free
-		&& (char *)((hhdr *)hdr->next)->next - (char *)ptr >= oldsize)
+	if (HDR_CNEXT(hdr) < hbreak
+		&& HDR_FREE(HDR_HNEXT(hdr)))
 	{
-	    hdr->next = ((hhdr *)hdr->next)->next;
+	    hdr->ptr = HDR_HNEXT(HDR_HNEXT(hdr));
 	    return realloc(ptr, size);
 	}
 	else
 	{
 	    void *ptr2 = malloc(size);
-	    memcpy(ptr2, ptr, size);
+	    if (ptr2) memcpy(ptr2, ptr, size);
 	    free(ptr);
 	    return ptr2;
 	}
