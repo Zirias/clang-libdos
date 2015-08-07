@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <conio.h>
+#include <time.h>
 
 int main(int argc, char **argv)
 {
@@ -20,11 +21,10 @@ int main(int argc, char **argv)
     WINDOW *field = newwin(0, 0, 1, 0);
 
     wbkgd(status, COLOR_PAIR(1)|A_BLINK);
-    mvwaddstr(status, 0, 1, "example title bar -- press key");
+    mvwaddstr(status, 0, 1, "example title bar");
     wrefresh(status);
     wbkgd(field, COLOR_PAIR(0)|A_BLINK);
     wrefresh(field);
-    getch();
 
     WINDOW *dlg = subwin(field, 10, 40, 5, 20);
     wbkgd(dlg, COLOR_PAIR(2)|A_BOLD);
@@ -45,18 +45,12 @@ int main(int argc, char **argv)
     delwin(status);
     endwin();
 
-    putstr("Timeout test (setdelay(0)) -- ESC to quit:\n");
+    putstr("rand() test -- ESC to quit:\n");
 
-    int c = 0;
-    int i = 0;
-    setdelay(0);
-    while (c != KEY_ESC)
+    srand(time(0));
+    while (getch() != KEY_ESC)
     {
-	static int spin[] = { '|', '/', '-', '\\' };
-	putch(spin[i++]);
-	if (i == 4) i = 0;
-	c = getch();
-	if (c >= 0) printf("0x%04x\n", c);
+	printf("rand(): %d\n", rand());
     }
 
     return 0;

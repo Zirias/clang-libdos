@@ -12,7 +12,7 @@ struct hhdr
 extern char _heap;
 static char *hbreak = &_heap;
 static hhdr hhead = { &_heap, 0 };
-static unsigned int randval = 1;
+static unsigned long long int randval = 1;
 
 static void *newchunk(size_t size)
 {
@@ -126,7 +126,7 @@ int rand(void)
 {
     randval *= 1103515245;
     randval += 12345;
-    return (int)(randval & 0x7fffffff);
+    return (int)((randval / 65536) & 0x7fffffff);
 }
 
 float _invSqrt(float x)
