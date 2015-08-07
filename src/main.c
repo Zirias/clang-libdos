@@ -17,18 +17,23 @@ int main(int argc, char **argv)
     init_pair(2, COLOR_WHITE, COLOR_BLUE);
 
     WINDOW *status = newwin(1, 0, 0, 0);
-    WINDOW *field = newwin(10, 40, 5, 20);
+    WINDOW *field = newwin(0, 0, 1, 0);
 
     wbkgd(status, COLOR_PAIR(1)|A_BLINK);
-    mvwaddstr(status, 0, 1, "example title bar");
+    mvwaddstr(status, 0, 1, "example title bar -- press key");
     wrefresh(status);
-    wbkgd(field, COLOR_PAIR(2)|A_BOLD);
-    box(field, 0, 0);
-    mvwaddstr(field, 2, 12, "EXAMPLE  DIALOG");
-    mvwprintw(field, 4, 2, "Test: %d", 42);
-    double sqr2 = sqrt(2);
-    mvwprintw(field, 5, 2, "Testing sqrt(): %d", (int)(sqr2 * 100000.0));
+    wbkgd(field, COLOR_PAIR(0)|A_BLINK);
     wrefresh(field);
+    getch();
+
+    WINDOW *dlg = subwin(field, 10, 40, 5, 20);
+    wbkgd(dlg, COLOR_PAIR(2)|A_BOLD);
+    box(dlg, 0, 0);
+    mvwaddstr(dlg, 2, 12, "EXAMPLE  DIALOG");
+    mvwprintw(dlg, 4, 2, "Test: %d", 42);
+    double sqr2 = sqrt(2);
+    mvwprintw(dlg, 5, 2, "Testing sqrt(): %d", (int)(sqr2 * 100000.0));
+    wrefresh(dlg);
 
     beep();
     flash();

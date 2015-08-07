@@ -134,11 +134,11 @@ int init_pair(short pair, short f, short b)
     return OK;
 }
 
-int wbkgd(WINDOW *win, chtype ch)
+static void _wbkgd(WINDOW *win, chtype ch, int sr, int sc, int nr, int nc)
 {
-    for (int r = 0; r < win->rows; ++r)
+    for (int r = sr; r < sr + nr; ++r)
     {
-	for (int c = 0; c < win->cols; ++c)
+	for (int c = sc; c < sc + nc; ++c)
 	{
 	    if ((win->data[r*win->cols+c] & 0xff) == (win->bkgd & 0xff))
 	    {
@@ -151,6 +151,14 @@ int wbkgd(WINDOW *win, chtype ch)
 	    }
 	}
     }
+}
+
+int wbkgd(WINDOW *win, chtype ch)
+{
+    if (win->parent) _wbkgd(win->parent, ch,
+	    win->row - win->parent->row, win->col - win->parent->col,
+	    win->rows, win->cols);
+    else _wbkgd(win, ch, 0, 0, win->rows, win->cols);
     win->bkgd = ch;
     return OK;
 }
@@ -205,8 +213,8 @@ int mvwaddch(WINDOW *win, int y, int x, const chtype ch)
     return waddch(win, ch);
 }
 
-int wborder(WINDOW *win, chtype ls, chtype rs, chtype ts, chtype bs,
-	chtype tl, chtype tr, chtype bl, chtype br)
+static void _wborder(WINDOW *win, chtype ls, chtype rs, chtype ts, chtype bs,
+	chtype tl, chtype tr, chtype bl, chtype br, int r, int c, int h, int w)
 {
     if (!ls) ls = ACS_VLINE;
     if (!rs) rs = ACS_VLINE;
@@ -217,39 +225,45 @@ int wborder(WINDOW *win, chtype ls, chtype rs, chtype ts, chtype bs,
     if (!bl) bl = ACS_LLCORNER;
     if (!br) br = ACS_LRCORNER;
 
-    win->data[0] = (win->data[0]&0xff00) | tl;
-    win->data[win->cols-1] = (win->data[win->cols-1]&0xff00) | tr;
-    win->data[(win->rows-1)*win->cols] =
-	(win->data[(win->rows-1)*win->cols]&0xff00) | bl;
-    win->data[win->rows*win->cols-1] =
-	(win->data[win->rows*win->cols-1]&0xff00) | br;
+    win->data[r*win->cols+c] = (win->data[r*win->cols+c]&0xff00) | tl;
+    win->data[r*win->cols+c+w-1] = (win->data[r*win->cols+c+w-1]&0xff00) | tr;
+    win->data[(r+h-1)*win->cols+c] =
+	(win->data[(r+h-1)*win->cols+c]&0xff00) | bl;
+    win->data[(r+h-1)*win->cols+c+w-1] =
+	(win->data[(r+h-1)*win->cols+c+w-1]&0xff00) | br;
 
-    for (int r = 1; r < win->rows-1;)
+    for (int ri = r+1; ri < r+h-1; ++ri)
     {
-	win->data[r*win->cols] = (win->data[r*win->cols]&0xff00) | ls;
-	++r;
-	win->data[r*win->cols-1] = (win->data[r*win->cols-1]&0xff00) | rs;
+	win->data[ri*win->cols+c] = (win->data[ri*win->cols+c]&0xff00) | ls;
+	win->data[ri*win->cols+c+w-1] =
+	    (win->data[ri*win->cols+c+w-1]&0xff00) | rs;
     }
 
-    for (int c = 1; c < win->cols-1; ++c)
+    for (int ci = c+1; ci < c+w-1; ++ci)
     {
-	win->data[c] = (win->data[c]&0xff00) | ts;
-	win->data[(win->rows-1)*win->cols+c] =
-	    (win->data[(win->rows-1)*win->cols+c]&0xff00) | bs;
+	win->data[r*win->cols+ci] = (win->data[r*win->cols+ci]&0xff00) | ts;
+	win->data[(r+h-1)*win->cols+ci] =
+	    (win->data[(r+h-1)*win->cols+ci]&0xff00) | bs;
     }
+}
 
+
+int wborder(WINDOW *win, chtype ls, chtype rs, chtype ts, chtype bs,
+	chtype tl, chtype tr, chtype bl, chtype br)
+{
+    if (win->parent) _wborder(win->parent, ls, rs, ts, bs, tl, tr, bl, br,
+	    win->row - win->parent->row, win->col - win->parent->col,
+	    win->rows, win->cols);
+    else _wborder(win, ls, rs, ts, bs, tl, tr, bl, br,
+	    0, 0, win->rows, win->cols);
     return OK;
 }
 
-int mvwaddnstr(WINDOW *win, int y, int x, const char *str, int n)
+void _waddnstr(WINDOW *win, int idx, const char *str, int n)
 {
     int wr = 0;
     const char *p = str;
-    int idx;
 
-    if (y >= 0 && x >= 0) wmove(win, y, x);
-
-    idx = win->cols * win->y + win->x;
     while (*p && wr != n)
     {
 	win->data[idx] = (win->data[idx]&0xff00) | (unsigned char)*p++;
@@ -262,6 +276,15 @@ int mvwaddnstr(WINDOW *win, int y, int x, const char *str, int n)
 	if (win->y < win->rows-2) ++win->y;
 	win->x -= win->cols;
     }
+}
+
+int mvwaddnstr(WINDOW *win, int y, int x, const char *str, int n)
+{
+    if (y >= 0 && x >= 0) wmove(win, y, x);
+    if (win->parent) _waddnstr(win->parent,
+	    (win->y+win->row-win->parent->row)*win->parent->cols
+	    +win->x+win->col-win->parent->col, str, n);
+    else _waddnstr(win, win->cols*win->y+win->x, str, n);
 
     return OK;
 }
