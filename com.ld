@@ -4,14 +4,19 @@ SECTIONS
     . = 0x0100;
     .text :
     {
-	*(.text);
+	*(.text*);
     }
     .data :
     {
-	*(.data);
-	*(.rodata);
+	*(.data*);
+	*(.rodata*);
 	*(COMMON);
-	*(.bss);
+	*(.bss*);
+    }
+    /DISCARD/ :
+    {
+	*(.note*);
+	*(.comment*);
     }
     _heap = ALIGN(4);
 }
