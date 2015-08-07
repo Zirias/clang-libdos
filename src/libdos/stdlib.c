@@ -143,7 +143,7 @@ int rand(void)
     return (int)((randval / 65536) & 0x7fffffff);
 }
 
-double _invSqrt(double x)
+double sqrt(double x)
 {
     double xhalf = 0.5*x;
     union
@@ -156,11 +156,6 @@ double _invSqrt(double x)
     x = u.x * (1.5 - xhalf * u.x * u.x);
     x = x * (1.5 - xhalf * x * x);
     x = x * (1.5 - xhalf * x * x);
-    return x;
-}
-
-double sqrt(double x)
-{
-    return 1.0f/_invSqrt(x);
+    return 1.0/x;
 }
 
