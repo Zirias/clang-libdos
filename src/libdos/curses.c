@@ -259,7 +259,7 @@ int wborder(WINDOW *win, chtype ls, chtype rs, chtype ts, chtype bs,
     return OK;
 }
 
-void _waddnstr(WINDOW *win, int idx, const char *str, int n)
+static void _waddnstr(WINDOW *win, int idx, const char *str, int n)
 {
     int wr = 0;
     const char *p = str;

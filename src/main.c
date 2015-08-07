@@ -34,6 +34,7 @@ int main(int argc, char **argv)
     double sqr2 = sqrt(2);
     mvwprintw(dlg, 5, 2, "Testing sqrt(): %d", (int)(sqr2 * 100000.0));
     wrefresh(dlg);
+    delwin(dlg);
 
     beep();
     flash();
