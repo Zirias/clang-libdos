@@ -55,6 +55,7 @@ char *strtok(char *str, const char *delim)
 cont:
 	++p;
     }
+    if (t && p > str) return str;
     return 0;
 }
 
