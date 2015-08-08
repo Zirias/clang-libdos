@@ -119,7 +119,7 @@ char *strqetok(char *str, const char *quot, const char *esc, const char *delim)
 	if (e)
 	{
 	    if (!t) t = w;
-	    *w++ = *r++;
+	    *w++ = *r;
 	    e = 0;
 	}
 	else if (q)
@@ -127,24 +127,22 @@ char *strqetok(char *str, const char *quot, const char *esc, const char *delim)
 	    if (*r == q)
 	    {
 		q = '\0';
-		++r;
 	    }
-	    else if (r[1] == q && _isinstr(*r, esc))
+	    else if (_isinstr(*r, esc) && r[1] &&
+		    (r[1] == q || _isinstr(r[1], esc)))
 	    {
 		e = 1;
-		++r;
 	    }
 	    else
 	    {
 		if (!t) t = w;
-		*w++ = *r++;
+		*w++ = *r;
 	    }
 	}
 	else
 	{
 	    if (_isinstr(*r, delim))
 	    {
-		++r;
 		if (t)
 		{
 		    *w++ = '\0';
@@ -154,18 +152,19 @@ char *strqetok(char *str, const char *quot, const char *esc, const char *delim)
 	    else if (_isinstr(*r, esc))
 	    {
 		e = 1;
-		++r;
 	    }
 	    else if (_isinstr(*r, quot))
 	    {
-		q = *r++;
+		if (!t) t = w;
+		q = *r;
 	    }
 	    else
 	    {
 		if (!t) t = w;
-		*w++ = *r++;
+		*w++ = *r;
 	    }
 	}
+	++r;
     }
     if (t) *w = '\0';
     return t;
