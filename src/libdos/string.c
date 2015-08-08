@@ -129,7 +129,7 @@ char *strqetok(char *str, const char *quot, const char *esc, const char *delim)
 		q = '\0';
 		++r;
 	    }
-	    else if (_isinstr(*r, esc) && r[1] == q)
+	    else if (r[1] == q && _isinstr(*r, esc))
 	    {
 		e = 1;
 		++r;
