@@ -10,7 +10,8 @@ static int argc = 0;
 static char *argv[32];
 #endif
 
-static void __attribute__((__noreturn__, __used__)) start(void)
+static void __attribute__((__noreturn__, __used__, __section__(".comstartup")))
+start(void)
 {
     _getcinfo();
 
