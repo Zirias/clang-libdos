@@ -6,7 +6,7 @@ static inline double sqrt(double x)
     __asm__ (
 	    "fldl   %0	    \n\t" \
 	    "fsqrt	    \n\t" \
-	    "fstl   %0	    \n\t" \
+	    "fstpl   %0	    \n\t" \
 	    : "=m" ((x))
 	    : "m" ((x))
 	    );
