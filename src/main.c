@@ -7,8 +7,13 @@
 
 int main(int argc, char **argv)
 {
-    (void)(argc);
-    (void)(argv);
+    puts("Testing command line:");
+    for (int i = 0; i < argc; ++i)
+    {
+	printf("argv[%2d] = %s\n", i, argv[i]);
+    }
+    puts("Any key to continue ...");
+    getch();
 
     initscr();
     curs_set(0);

@@ -2,10 +2,10 @@
 #include "stdlib.h"
 
 int main();
-static char *progname(void);
 void _getcinfo(void);
 
 #ifndef NOARGV
+static char *progname(void);
 static int argc = 0;
 static char *argv[32];
 #endif
@@ -21,12 +21,12 @@ static void __attribute__((__noreturn__, __used__)) start(void)
     argc = 1;
     argv[0] = progname();
 
-    if ((argv[argc] = strtok(cmdline, " \t\r\n")))
+    if ((argv[argc] = strqetok(cmdline, "\"'", "\\", " \t\r\n")))
     {
 	++argc;
 	while (argc < 32)
 	{
-	    if (!(argv[argc] = strtok(0, " \t\r\n"))) break;
+	    if (!(argv[argc] = strqetok(0, "\"'", "\\", " \t\r\n"))) break;
 	    ++argc;
 	}
     }

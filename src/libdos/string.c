@@ -97,3 +97,77 @@ char *strerror(int errnum)
     snprintf(unknown, 18, "Unknown error %03d", errnum);
     return unknown;
 }
+
+char *strqetok(char *str, const char *quot, const char *esc, const char *delim)
+{
+    static char *r, *w;
+    static unsigned char e;
+    static char q;
+    char *t = 0;
+
+    if (str)
+    {
+	r = w = str;
+	e = 0;
+	q = '\0';
+    }
+
+    if (!r) return 0;
+
+    while (*r)
+    {
+	if (e)
+	{
+	    if (!t) t = w;
+	    *w++ = *r++;
+	    e = 0;
+	}
+	else if (q)
+	{
+	    if (*r == q)
+	    {
+		q = '\0';
+		++r;
+	    }
+	    else if (_isinstr(*r, esc) && r[1] == q)
+	    {
+		e = 1;
+		++r;
+	    }
+	    else
+	    {
+		if (!t) t = w;
+		*w++ = *r++;
+	    }
+	}
+	else
+	{
+	    if (_isinstr(*r, delim))
+	    {
+		++r;
+		if (t)
+		{
+		    *w++ = '\0';
+		    return t;
+		}
+	    }
+	    else if (_isinstr(*r, esc))
+	    {
+		e = 1;
+		++r;
+	    }
+	    else if (_isinstr(*r, quot))
+	    {
+		q = *r++;
+	    }
+	    else
+	    {
+		if (!t) t = w;
+		*w++ = *r++;
+	    }
+	}
+    }
+    if (t) *w = '\0';
+    return t;
+}
+
