@@ -1,20 +1,11 @@
-#include "stdio.h"
+#include <stdio.h>
 
-#include "conio.h"
-#include "string.h"
-#include "stdarg.h"
+#include <stdarg.h>
+#include <string.h>
+#include <errno.h>
+#include <conio.h>
 
 static char fpbuf[32];
-
-int errno = 0;
-
-static const int stdinfd = 0;
-static const int stdoutfd = 1;
-static const int stderrfd = 2;
-
-const FILE *stdin = &stdinfd;
-const FILE *stdout = &stdoutfd;
-const FILE *stderr = &stderrfd;
 
 typedef enum farglen
 {
@@ -296,27 +287,4 @@ int printf(const char *format, ...)
     va_end(ap);
 
     return ret;
-}
-
-int puts(const char *s)
-{
-    putstr(s);
-    putstr("\n");
-    return 1;
-}
-
-int fputs(const char *s, FILE *stream)
-{
-    if (stream != stdout && stream != stderr)
-    {
-	errno = ENOSYS;
-	return EOF;
-    }
-    return putstr(s);
-}
-
-void perror(const char *s)
-{
-    if (s && *s) printf("%s: %s\n", s, strerror(errno));
-    else puts(strerror(errno));
 }

@@ -1,7 +1,7 @@
-#include "stdlib.h"
+#include <stdlib.h>
 
-#include "string.h"
-#include "errno.h"
+#include <string.h>
+#include <errno.h>
 
 #ifndef MALLOC_STACK_GAP
 #define MALLOC_STACK_GAP 0x40
@@ -24,7 +24,6 @@ union hhdr {
 extern char _heap;
 static char *hbreak = &_heap;
 static hhdr hhead = { &_heap };
-static unsigned long long int randval = 1;
 
 unsigned short newchunk(size_t size)
 {
@@ -129,17 +128,5 @@ void *realloc(void *ptr, size_t size)
 	    return ptr2;
 	}
     }
-}
-
-void srand(unsigned int seed)
-{
-    randval = seed;
-}
-
-int rand(void)
-{
-    randval *= 1103515245;
-    randval += 12345;
-    return (int)((randval / 65536) & 0x7fffffff);
 }
 

@@ -1,5 +1,5 @@
-#include "conio.h"
-#include "rtctimer.h"
+#include <conio.h>
+#include <rtctimer.h>
 
 static int cpage = 0;
 static int crow;

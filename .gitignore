@@ -1,5 +1,11 @@
 *.swp
-*.o
 *~
-test.com
+*.a
+*.s
+*.o
+*.d
+*.com
+conf.mk
+asm/
+obj/
 

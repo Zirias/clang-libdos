@@ -1,5 +1,5 @@
-#include "string.h"
-#include "stdlib.h"
+#include <string.h>
+#include <stdlib.h>
 
 int main();
 void _getcinfo(void);
@@ -10,8 +10,8 @@ static int argc = 0;
 static char *argv[32];
 #endif
 
-static void __attribute__((__noreturn__, __used__, __section__(".comstartup")))
-start(void)
+void __attribute__((__noreturn__, __used__, __section__(".comstartup")))
+__com__start(void)
 {
     _getcinfo();
 

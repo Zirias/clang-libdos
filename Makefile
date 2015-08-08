@@ -1,32 +1,33 @@
-BINARY:= test.com
-SOURCES:= src/main.c
-LIBDOS:= src/libdos/doscrt0.c src/libdos/stdlib.c src/libdos/string.c \
-	src/libdos/stdio.c src/libdos/time.c src/libdos/conio.c \
-	src/libdos/rtctimer.c src/libdos/curses.c
-LDSCRIPT:= com.ld
+all: lib/libdos.a
 
-CFLAGS:= -std=c99 -Oz -nostdlib -m16 -march=i386 -mregparm=3 \
-    -ffreestanding -fdata-sections -ffunction-sections \
-    -I./src/libdos -Wall -Wextra -pedantic
-LDFLAGS:= -Wl,--omagic,--script=$(LDSCRIPT),--gc-sections
+include mk/doslib.mk
 
-ALLSRC:= $(SOURCES) $(LIBDOS)
+libdos_TARGET:= libdos.a
+libdos_TGTDIR:= lib
+libdos_SRCDIR:= src
+libdos_OBJDIR:= obj
+libdos_ASMDIR:= asm
+libdos_MODULES:= doscrt0 errno conio rtctimer \
+	time/time_completetm time/time_getrtctm time/time_mktime \
+	time/time_readrtc time/time_time \
+	stdlib/stdlib_malloc stdlib/stdlib_rand \
+	string/string_mem string/string_strerror string/string_strtok \
+	string/string_strcpy string/string_strlen \
+	stdio/stdio_core stdio/stdio_printf \
+	curses/curses_core curses/curses_win curses/curses_bkgd \
+	curses/curses_addch curses/curses_addstr curses/curses_erase \
+	curses/curses_printw curses/curses_border
 
-all: $(BINARY)
-
-$(BINARY): $(ALLSRC:.c=.o) | $(LDSCRIPT)
-	clang -o$@ $(CFLAGS) $(LDFLAGS) $^
-
-%.o: %.c
-
-%.o: %.s
-	echo \\t.code16 | cat - $< | as --32 -march=i586 -o$@
-
-%.s: %.c
-	clang -S -o$@ $(CFLAGS) $<
+T:= libdos
+$(eval $(DOSLIBRULES))
 
 clean:
-	rm -f $(ALLSRC:.c=.o)
-	rm -f $(ALLSRC:.c=.s)
+	rm -f $(CLEAN)
+	rm -fr asm
+	rm -fr obj
 
-.PHONY: all clean $(BINARY)
+distclean: clean
+	rm -f lib/libdos.a
+
+.PHONY: all clean distclean
+

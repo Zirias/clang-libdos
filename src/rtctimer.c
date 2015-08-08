@@ -1,5 +1,5 @@
-#include "rtctimer.h"
-#include "errno.h"
+#include <rtctimer.h>
+#include <errno.h>
 
 static volatile unsigned char timer = 0;
 

@@ -1,20 +1,4 @@
-#include "string.h"
-#include "errno.h"
-#include "stdio.h"
-
-size_t strlen(const char *s)
-{
-    size_t l = 0;
-    while (*s++) ++l;
-    return l;
-}
-
-char *strcpy(char *dest, const char *src)
-{
-    char *p = dest;
-    while ((*p++ = *src++));
-    return dest;
-}
+#include <string.h>
 
 static int _isinstr(const char c, const char *str)
 {
@@ -59,43 +43,6 @@ cont:
 	return str;
     }
     return 0;
-}
-
-void *memcpy(void *dest, const void *src, size_t n)
-{
-    if (!dest) return 0;
-    for (size_t i = 0; i < n; ++i)
-    {
-	((char *)dest)[i] = ((const char *)src)[i];
-    }
-    return dest;
-}
-
-void *memset(void *s, int c, size_t n)
-{
-    if (!s) return 0;
-    for (size_t i = 0; i < n; ++i)
-    {
-	((char *)s)[i] = (char)c;
-    }
-    return s;
-}
-
-char *strerror(int errnum)
-{
-    static char unknown[18];
-    switch (errnum)
-    {
-	case EINVAL: return "Invalid argument";
-	case ENOSYS: return "Function not implemented";
-	case ENODEV: return "No such device";
-	case ECANCELED: return "Operation canceled";
-	case EBUSY: return "Device or resource busy";
-	case ENOMEM: return "Not enough space";
-    }
-    errno = EINVAL;
-    snprintf(unknown, 18, "Unknown error %03d", errnum);
-    return unknown;
 }
 
 char *strqetok(char *str, const char *quot, const char *esc, const char *delim)
