@@ -16,8 +16,13 @@ $$($(T)_TGTDIR)/$$($(T)_TARGET): $$($(T)_OBJS) | $$($(T)_TGTDIR)
 
 $$($(T)_TGTDIR)/$$($(T)_TARGET): $$(LIBDOSPATH)/lib/libdos.a
 
-$$(LIBDOSPATH)/lib/libdos.a:
+ifneq ($$(strip $$(wildcard $$(LIBDOSPATH)/Makefile)),)
+export USEREGPARM
+export USEARGV
+$$(LIBDOSPATH)/lib/libdos.a: conf.mk
 	$$(MAKE) -C $$(LIBDOSPATH)
+	$$(VR)touch $$(LIBDOSPATH)/lib/libdos.a
+endif
 
 endef
 
