@@ -1,8 +1,8 @@
 #default config
 CC:= clang
 AS:= as
-USEREGPARM:= 1
-USEARGV:= 1
+USEREGPARM?= 1
+USEARGV?= 1
 
 # save / compare config
 ifneq ($(MAKECMDGOALS),clean)
