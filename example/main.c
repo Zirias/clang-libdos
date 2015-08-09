@@ -5,6 +5,11 @@
 #include <conio.h>
 #include <time.h>
 
+#ifdef NOARGV
+int main()
+{
+    puts("Command line disabled.");
+#else
 int main(int argc, char **argv)
 {
     puts("Testing command line:");
@@ -12,6 +17,7 @@ int main(int argc, char **argv)
     {
 	printf("argv[%2d] = %s\n", i, argv[i]);
     }
+#endif
     puts("Any key to continue ...");
     getch();
 

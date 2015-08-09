@@ -1,23 +1,43 @@
-#include <string.h>
-#include <stdlib.h>
-
 int main();
 void _getcinfo(void);
 
 #ifndef NOARGV
+#include <string.h>
+#include <dos.h>
+
+static void argstart(void) __attribute__((__noreturn__, __used__));
 static char *progname(void);
 static int argc = 0;
 static char *argv[32];
 #endif
 
-void __attribute__((__noreturn__, __used__, __section__(".comstartup")))
-__com__start(void)
-{
-    _getcinfo();
-
+__asm__ (
+	"   .section	.comstartup		\n"
+	"   .globl	__com__start		\n"
+	"__com__start:				\n"
+	"   call	_getcinfo		\n"
 #ifdef NOARGV
-    exit(main());
+	"   call	main			\n"
+	"   jmp		exit			\n"
 #else
+	"   jmp		argstart		\n"
+#endif
+	"   .text				\n");
+
+void __attribute__((__noreturn__)) exit(int status)
+{
+    __asm__ volatile (
+	    "mov    $0x4c, %%ah	    \n\t"
+	    "int    $0x21	    \n\t"
+	    :
+	    : "a" (status)
+	    );
+    __builtin_unreachable();
+}
+
+#ifndef NOARGV
+static void argstart(void)
+{
     char *cmdline = (char *)0x81;
     argc = 1;
     argv[0] = progname();
@@ -33,38 +53,8 @@ __com__start(void)
     }
 
     exit(main(argc, argv));
-#endif
-
 }
 
-void __attribute__((__noreturn__)) exit(int status)
-{
-    __asm__ volatile (
-	    "mov    $0x4c, %%ah	    \n\t"
-	    "int    $0x21	    \n\t"
-	    :
-	    : "a" (status)
-	    );
-    __builtin_unreachable();
-}
-
-unsigned short dosversion(void)
-{
-    unsigned short v1, v2;
-    __asm__ (
-	    "mov    $0x30, %%ah	    \n\t"
-	    "int    $0x21	    \n\t"
-	    : "=a" (v1)
-	    :
-	    : "bx", "cx"
-	    );
-    if (!(v1 & 0xff)) v1 = 0x0001;
-    v2 = v1 >> 8 & 0xff;
-    v1 = v1 << 8 | v2;
-    return v1;
-}
-
-#ifndef NOARGV
 static char *progname(void)
 {
     if (dosversion() < 0x0300) return "";

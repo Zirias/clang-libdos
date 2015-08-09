@@ -7,7 +7,7 @@ libdos_TGTDIR:= lib
 libdos_SRCDIR:= src
 libdos_OBJDIR:= obj
 libdos_ASMDIR:= asm
-libdos_MODULES:= doscrt0 errno conio rtctimer \
+libdos_MODULES:= doscrt0 dosversion errno conio rtctimer \
 	time/time_completetm time/time_getrtctm time/time_mktime \
 	time/time_readrtc time/time_time \
 	stdlib/stdlib_malloc stdlib/stdlib_rand \
