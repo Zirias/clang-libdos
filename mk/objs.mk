@@ -49,8 +49,12 @@ endif
 
 $$($(T)_OBJDIR)/%.o: $$($(T)_ASMDIR)/%.s Makefile conf.mk | $$($(T)_OBJDIR)
 	$$(VAS)
+ifeq ($$(USECC),clang)
 	$$(VR)echo \\t.code16 | cat - $$< | \
 		$$(AS) $$($(T)_ASMFLAGS) $$(ASMFLAGS) -o$$@
+else
+	$$(VR)$$(AS) $$($(T)_ASMFLAGS) $$(ASMFLAGS) -o$$@ $$<
+endif
 
 $$($(T)_ASMDIR)/%.s: $$($(T)_SRCDIR)/%.c Makefile conf.mk | $$($(T)_ASMDIR)
 	$$(VCC)
