@@ -35,6 +35,9 @@ static void _gotoxy(void)
 	    );
 }
 
+#if defined(__GNUC__) && !defined(__clang__)
+__attribute__((optimize("omit-frame-pointer")))
+#endif
 static void _scroll(int lines)
 {
     __asm__ volatile (
