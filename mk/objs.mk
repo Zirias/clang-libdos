@@ -36,29 +36,20 @@ endif
 
 %.o: %.c
 
-$$($(T)_ASMDIR)/%.d: $$($(T)_SRCDIR)/%.c Makefile conf.mk | $$($(T)_ASMDIR)
+$$($(T)_OBJDIR)/%.d: $$($(T)_SRCDIR)/%.c Makefile conf.mk | $$($(T)_OBJDIR)
 	$$(VDEP)
-	$$(VR)$$(CC) -MM -MT"$$@ $$(@:.d=.s)" -MF$$@ \
+	$$(VR)$$(CC) -MM -MT"$$@ $$(@:.d=.o)" -MF$$@ \
 		$$($(T)_CFLAGS) $$(CFLAGS) $$($(T)_INCLUDES) $$(INCLUDES) $$<
 
 ifneq ($$(MAKECMDGOALS),clean)
 ifneq ($$(MAKECMDGOALS),distclean)
--include $$($(T)_ASMS:.s=.d)
+-include $$($(T)_OBJS:.o=.d)
 endif
 endif
 
-$$($(T)_OBJDIR)/%.o: $$($(T)_ASMDIR)/%.s Makefile conf.mk | $$($(T)_OBJDIR)
-	$$(VAS)
-ifeq ($$(USECC),clang)
-	$$(VR)echo \\t.code16 | cat - $$< | \
-		$$(AS) $$($(T)_ASMFLAGS) $$(ASMFLAGS) -o$$@
-else
-	$$(VR)$$(AS) $$($(T)_ASMFLAGS) $$(ASMFLAGS) -o$$@ $$<
-endif
-
-$$($(T)_ASMDIR)/%.s: $$($(T)_SRCDIR)/%.c Makefile conf.mk | $$($(T)_ASMDIR)
+$$($(T)_OBJDIR)/%.o: $$($(T)_SRCDIR)/%.c Makefile conf.mk | $$($(T)_OBJDIR)
 	$$(VCC)
-	$$(VR)$$(CC) -S -o$$@ $$($(T)_CFLAGS) $$(CFLAGS) \
+	$$(VR)$$(CC) -c -o$$@ $$($(T)_CFLAGS) $$(CFLAGS) \
 		$$($(T)_INCLUDES) $$(INCLUDES) $$<
 
 endef
