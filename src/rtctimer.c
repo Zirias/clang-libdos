@@ -15,7 +15,11 @@ int rtctset(unsigned int usecs)
 	    "clc		    \n\t"
 	    "int    $0x15	    \n\t"
 	    "jnc    1f		    \n\t"
-	    "mov    %%ah, %0	    \n"
+#ifdef __clang__
+	    "mov %%ah, %0	    \n"
+#else
+	    "movzbl %%ah, %0	    \n"
+#endif
 	    "1:			    \n\t"
 	    : "=rm" (err)
 	    : "b" (&timer), "c" (cx), "d" (dx)

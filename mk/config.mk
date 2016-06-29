@@ -1,5 +1,5 @@
 #default config
-USECC?= clang
+USECC?= gcc
 USEAS?= as
 USEREGPARM?= 1
 USEARGV?= 1

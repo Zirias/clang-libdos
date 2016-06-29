@@ -117,6 +117,10 @@ static const char *_fftcharg(const char **s, va_list *ap)
 			break;
 		    case FAL_L:
 			num = va_arg(*ap, unsigned long);
+			break;
+		    default:
+			num = va_arg(*ap, int);
+			break;
 		}
 		_fnumarg((long)num, pad, minwidth, 1, 0);
 		(*s)++;
@@ -140,6 +144,10 @@ static const char *_fftcharg(const char **s, va_list *ap)
 			break;
 		    case FAL_L:
 			num = va_arg(*ap, unsigned long);
+			break;
+		    default:
+			num = va_arg(*ap, int);
+			break;
 		}
 		_fnumarg((long)num, pad, minwidth, 0, hex);
 		(*s)++;
