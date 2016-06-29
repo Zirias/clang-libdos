@@ -20,3 +20,13 @@ void *memset(void *s, int c, size_t n)
     return s;
 }
 
+void *memchr(const void *s, int c, size_t n)
+{
+    const char *p = s;
+    while (n--) {
+	if (*p == (char)c)
+	    return (void *)p;
+	p++;
+    }
+    return NULL;
+}

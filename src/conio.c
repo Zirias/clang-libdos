@@ -35,6 +35,9 @@ static void _gotoxy(void)
 	    );
 }
 
+#if defined(__GNUC__) && !defined(__clang__)
+__attribute__((optimize("omit-frame-pointer")))
+#endif
 static void _scroll(int lines)
 {
     __asm__ volatile (
@@ -186,15 +189,14 @@ havekey:
 
 void putchrp(int c, int repeat)
 {
-    unsigned short attr;
+    unsigned short attr, cx;
     if (c & 0xff00) attr = c >> 8;
     else attr = cattr;
     __asm__ volatile (
 	    "mov    $0x09, %%ah	    \n\t"
 	    "int    $0x10	    \n\t"
-	    :
+	    : "=c"(cx)
 	    : "a" (c), "b" ((cpage << 8) | attr), "c" (repeat)
-	    : "cx"
 	    );
 }
 

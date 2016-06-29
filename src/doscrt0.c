@@ -57,13 +57,27 @@ static void argstart(void)
 
 static char *progname(void)
 {
+    static char buf[128];
+
     if (dosversion() < 0x0300) return "";
 
-    unsigned int envaddr = (*(char *)0x2d << 8 | *(char *)0x2c) ;
-    char *envptr = (char *)envaddr;
-
-    while (*envptr) envptr += strlen(envptr) + 1;
-    return envptr + 3;
+    unsigned short __ds;
+    __asm__ volatile ("mov %%ds, %0\n"
+                      "mov %1, %%ds\n" :
+                      "=&r"(__ds) :
+                      "r"(*(unsigned short *)0x2c));
+    char *cmdl = memchr(0, 1, 8192);
+    if (!cmdl) {
+	__asm__ volatile ("mov %0, %%ds\n" :: "r"(__ds));
+	return "";
+    }
+    cmdl += 2;
+    unsigned short l = strlen(cmdl), c, d, s;
+    __asm__ volatile ("rep; movsb\n" :
+                      "=c"(c), "=D"(d), "=S"(s):
+                      "c"(l), "S"(cmdl), "D"(buf));
+    __asm__ volatile ("movw %0, %%ds\n" :: "r"(__ds));
+    return buf;
 }
 #endif
 
