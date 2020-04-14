@@ -192,9 +192,8 @@ void putchrp(int c, int repeat)
     __asm__ volatile (
 	    "mov    $0x09, %%ah	    \n\t"
 	    "int    $0x10	    \n\t"
-	    :
-	    : "a" (c), "b" ((cpage << 8) | attr), "c" (repeat)
-	    : "cx"
+	    : "+c" (repeat)
+	    : "a" (c), "b" ((cpage << 8) | attr)
 	    );
 }
 
