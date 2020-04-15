@@ -124,8 +124,10 @@ static const char *_fftcharg(const char **s, va_list *ap)
 
 	    case 'X':
 		++hex;
+		// fall through
 	    case 'x':
 		++hex;
+		// fall through
 	    case 'u':
 		switch (len)
 		{

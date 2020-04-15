@@ -10,6 +10,7 @@
 #define HDR_CNEXT(x) ((char *)((unsigned int)(x)->parts.next))
 #define HDR_HNEXT(x) ((hhdr *)((unsigned int)(x)->parts.next))
 #define HDR_FREE(x) ((x)->parts.free)
+#define SHORTPTR(x) ((unsigned short)(unsigned int)(x))
 
 typedef union hhdr hhdr;
 union hhdr {
@@ -36,7 +37,7 @@ unsigned short newchunk(size_t size)
     if (hbreak > stack - MALLOC_STACK_GAP) hbreak = stack - MALLOC_STACK_GAP;
     chunk->ptr = hbreak;
     chunk->parts.free = 1;
-    return (unsigned short)chunk;
+    return SHORTPTR(chunk);
 }
 
 void *malloc(size_t size)
@@ -56,7 +57,7 @@ void *malloc(size_t size)
 		hhdr *hdr2 = (hhdr *)((char *)hdr + sizeof(hhdr) + size);
 		hdr2->parts.free = 1;
 		hdr2->parts.next = hdr->parts.next;
-		hdr->parts.next = (unsigned short)hdr2;
+		hdr->parts.next = SHORTPTR(hdr2);
 	    }
 	    hdr->parts.free = 0;
 	    return (char *)hdr + sizeof(hhdr);
@@ -79,14 +80,14 @@ void free(void *ptr)
     if (hdr != (hhdr *)hhead.ptr)
     {
 	hhdr *hdr2 = (hhdr *)hhead.ptr;
-	while (hdr2->parts.next != (unsigned short)hdr) hdr2 = HDR_HNEXT(hdr2);
+	while (hdr2->parts.next != SHORTPTR(hdr)) hdr2 = HDR_HNEXT(hdr2);
 	if (HDR_FREE(hdr2)) hdr = hdr2;
     }
     hhdr *next = HDR_HNEXT(hdr);
     while ((char *)next < hbreak)
     {
 	if (!HDR_FREE(next)) break;
-	hdr->parts.next = (unsigned short)next;
+	hdr->parts.next = SHORTPTR(next);
 	next = HDR_HNEXT(next);
     }
     if ((char *)next == hbreak) hbreak = (char *)hdr;
@@ -105,7 +106,7 @@ void *realloc(void *ptr, size_t size)
     size_t oldsize = HDR_CNEXT(hdr) - (char *)ptr;
     if (size <= oldsize)
     {
-	if (oldsize - size <= 2*sizeof(hhdr)) return ptr;
+	if ((unsigned int)(oldsize - size) <= 2*sizeof(hhdr)) return ptr;
 	hhdr *hdr2 = (hhdr *)((char *)ptr + size);
 	hdr2->ptr = hdr->ptr;
 	hdr->ptr = hdr2;
