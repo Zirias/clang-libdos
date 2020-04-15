@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <conio.h>
 #include <time.h>
+#include <rtctimer.h>
 
 #ifdef NOARGV
 int main()
@@ -20,6 +21,30 @@ int main(int argc, char **argv)
 #endif
     puts("Any key to continue ...");
     getch();
+
+    puts("Testing RTC:");
+    struct tm tm;
+    if (getrtctm(&tm) < 0)
+    {
+	puts("Error reading RTC");
+    }
+    else
+    {
+	printf("%04d-%02d-%02d %02d:%02d:%02d\n", tm.tm_year+1900,
+		tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+    }
+    puts("Any key to continue ...");
+    getch();
+
+    /*
+    puts("Testing RTC timer ...");
+    for (int i = 0; i < 4; ++i)
+    {
+	rtctset(500000);
+	rtctwait();
+	puts("<tick> ...");
+    }
+    */
 
     initscr();
     curs_set(0);
